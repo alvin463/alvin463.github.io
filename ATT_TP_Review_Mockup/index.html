@@ -97,11 +97,26 @@
       padding: 0 14px;
     }
 
+    /* Fixed header for review screen */
+    #screenReview .header-fixed{
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--wtw-bg);
+      padding-bottom: 14px;
+    }
+
+    #reviewLayout{
+      height: calc(100vh - 220px);
+      overflow: hidden;
+    }
+
     .review-grid{
       display: grid;
       grid-template-columns: 36% 64%;
       gap: 14px;
-      align-items: start;
+      height: 100%;
+      align-items: stretch;
     }
 
     .sidebar-collapsed .review-grid{
@@ -109,15 +124,23 @@
     }
 
     .sidebar{
-      min-height: calc(100vh - 160px);
-      overflow: hidden;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
       transition: width .2s ease, opacity .2s ease;
     }
 
     .sidebar-collapsed .sidebar{
       opacity: 0;
       pointer-events: none;
-      height: 0;
+      width: 0;
+    }
+
+    /* Scrollable main panel */
+    .main-panel{
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     /* Test case list */
@@ -316,24 +339,26 @@
          SCREEN 2: Review Workbench
     ----------------------------- -->
     <section id="screenReview" class="d-none">
-      <!-- Top panel: Test Plan Name -->
-      <div class="card p-3 mb-3">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-          <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-light border" id="btnToggleSidebar" title="Toggle test case list">
-              <i class="bi bi-list"></i>
-            </button>
-            <div>
-              <div class="subtle small">Test Plan</div>
-              <div class="fw-bold" id="planTitleTop">Kat ATT Test Plan</div>
+      <!-- Top panel: Test Plan Name (Fixed) -->
+      <div class="header-fixed">
+        <div class="card p-3">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <button class="btn btn-sm btn-light border" id="btnToggleSidebar" title="Toggle test case list">
+                <i class="bi bi-list"></i>
+              </button>
+              <div>
+                <div class="subtle small">Test Plan</div>
+                <div class="fw-bold" id="planTitleTop">Kat ATT Test Plan</div>
+              </div>
             </div>
-          </div>
 
-          <div class="d-flex flex-wrap align-items-center gap-2">
-            <span class="badge badge-soft px-3 py-2" id="progressBadge">0 / 8 reviewed</span>
-            <button class="btn btn-sm btn-light border" id="btnBackToWelcome" title="Back">
-              <i class="bi bi-arrow-left"></i> Back
-            </button>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <span class="badge badge-soft px-3 py-2" id="progressBadge">0 / 8 reviewed</span>
+              <button class="btn btn-sm btn-light border" id="btnBackToWelcome" title="Back">
+                <i class="bi bi-arrow-left"></i> Back
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -373,7 +398,7 @@
           </aside>
 
           <!-- Right panel: Test case details -->
-          <section>
+          <section class="main-panel">
             <div class="card p-3">
               <div class="d-flex align-items-start justify-content-between gap-2">
                 <div>
