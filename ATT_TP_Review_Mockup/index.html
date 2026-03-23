@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WTW • Test Plan Review</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Highlight.js (SQL) -->
+  <!-- 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/sql.min.js"></script>
+ -->
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/default.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+
+<!-- and it's easy to individually load additional languages -->
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/sql.min.js"></script>
+
+  <style>
+    /* -----------------------------
+       WTW-ish Theme Tokens
+       (Swap values to match your official brand sheet)
+    --------------------------------*/
+    :root{
+      --wtw-purple: #6f2dbd;      /* primary accent */
+      --wtw-purple-700:#5b239b;
+      --wtw-ink: #1f1f1f;
+      --wtw-muted: #6b7280;
+      --wtw-border: #e5e7eb;
+      --wtw-surface: #ffffff;
+      --wtw-bg: #f6f7fb;
+      --wtw-success: #14804a;
+      --wtw-danger: #b42318;
+      --wtw-warning: #b54708;
+      --radius: 14px;
+    }
+
+    body{
+      background: var(--wtw-bg);
+      color: var(--wtw-ink);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .wtw-navbar{
+      background: var(--wtw-surface);
+      border-bottom: 1px solid var(--wtw-border);
+    }
+
+    .brand-dot{
+      width:10px; height:10px; border-radius:999px; background:var(--wtw-purple);
+      display:inline-block; margin:0 6px 1px 6px;
+    }
+
+    .btn-wtw{
+      --bs-btn-bg: var(--wtw-purple);
+      --bs-btn-border-color: var(--wtw-purple);
+      --bs-btn-hover-bg: var(--wtw-purple-700);
+      --bs-btn-hover-border-color: var(--wtw-purple-700);
+      --bs-btn-color: #fff;
+      --bs-btn-hover-color: #fff;
+    }
+
+    .btn-wtw-outline{
+      --bs-btn-color: var(--wtw-purple);
+      --bs-btn-border-color: var(--wtw-purple);
+      --bs-btn-hover-bg: rgba(111,45,189,.08);
+      --bs-btn-hover-border-color: var(--wtw-purple-700);
+    }
+
+    .card{
+      border: 1px solid var(--wtw-border);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 0 rgba(16,24,40,.02);
+    }
+
+    .section-title{
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+
+    .subtle{
+      color: var(--wtw-muted);
+    }
+
+    /* Layout */
+    .app-shell{
+      max-width: 1400px;
+      margin: 18px auto;
+      padding: 0 14px;
+    }
+
+    .review-grid{
+      display: grid;
+      grid-template-columns: 36% 64%;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .sidebar-collapsed .review-grid{
+      grid-template-columns: 0 100%;
+    }
+
+    .sidebar{
+      min-height: calc(100vh - 160px);
+      overflow: hidden;
+      transition: width .2s ease, opacity .2s ease;
+    }
+
+    .sidebar-collapsed .sidebar{
+      opacity: 0;
+      pointer-events: none;
+      height: 0;
+    }
+
+    /* Test case list */
+    .tc-row{
+      border: 1px solid var(--wtw-border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff;
+      cursor: pointer;
+      transition: transform .05s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .tc-row:hover{
+      border-color: rgba(111,45,189,.35);
+      box-shadow: 0 8px 20px rgba(16,24,40,.06);
+    }
+    .tc-row.active{
+      border-color: var(--wtw-purple);
+      box-shadow: 0 10px 24px rgba(111,45,189,.12);
+      outline: 2px solid rgba(111,45,189,.10);
+    }
+
+    .badge-soft{
+      border: 1px solid var(--wtw-border);
+      background: #fff;
+      color: var(--wtw-muted);
+      font-weight: 600;
+    }
+    .badge-approved{ border-color: rgba(20,128,74,.25); background: rgba(20,128,74,.08); color: var(--wtw-success); }
+    .badge-rejected{ border-color: rgba(180,35,24,.25); background: rgba(180,35,24,.08); color: var(--wtw-danger); }
+    .badge-pending{ border-color: rgba(181,71,8,.25); background: rgba(181,71,8,.08); color: var(--wtw-warning); }
+
+    /* “Textarea” with SQL syntax highlight (layered) */
+    .code-editor{
+      position: relative;
+      border: 1px solid var(--wtw-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0b1020; /* dark surface for code contrast */
+    }
+    .code-editor pre{
+      margin: 0;
+      padding: 12px 14px;
+      min-height: 220px;
+      max-height: 320px;
+      overflow: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      background: transparent;
+    }
+    .code-editor textarea{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      resize: none;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      background: transparent;
+      color: transparent;          /* hides raw text */
+      caret-color: #ffffff;        /* keeps caret visible */
+      outline: none;
+      overflow: auto;
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    .code-editor .hljs{
+      background: transparent;
+      color: #e5e7eb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Form field emphasis */
+    .form-label{
+      font-weight: 600;
+      color: #374151;
+    }
+
+    /* Responsive: stack on narrow */
+    @media (max-width: 992px){
+      .review-grid{
+        grid-template-columns: 1fr;
+      }
+      .sidebar-collapsed .review-grid{
+        grid-template-columns: 1fr;
+      }
+      .sidebar{
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top Navbar -->
+  <nav class="navbar wtw-navbar">
+    <div class="container-fluid px-3">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-bold" style="color:var(--wtw-purple);">Willis Towers Watson</span>
+        <span class="brand-dot"></span>
+        <span class="fw-semibold">Test Plan Review</span>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm btn-light border" title="Notifications">
+          <i class="bi bi-bell"></i>
+        </button>
+        <button class="btn btn-sm btn-light border" title="Settings">
+          <i class="bi bi-gear"></i>
+        </button>
+        <div class="vr mx-1"></div>
+        <button class="btn btn-sm btn-light border" title="User">
+          <i class="bi bi-person-circle"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="app-shell" id="appRoot">
+    <!-- ----------------------------
+         SCREEN 1: Welcome Page
+    ----------------------------- -->
+    <section id="screenWelcome">
+      <div class="row g-3 align-items-stretch">
+        <div class="col-12 col-lg-8">
+          <div class="card p-4 h-100">
+            <div class="d-flex align-items-start justify-content-between gap-3">
+              <div>
+                <div class="subtle small">Welcome</div>
+                <h2 class="mb-2 section-title">Kat ATT Test Plan</h2>
+                <p class="subtle mb-0">
+                  Review the test cases assigned to this test plan. Approve or reject each test case with a streamlined flow.
+                </p>
+              </div>
+              <span class="badge badge-soft px-3 py-2">Review Session</span>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <div class="subtle small">Owner</div>
+                <div class="fw-semibold" id="welcomeOwner">Kat</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="subtle small">Assigned Reviewers</div>
+                <div class="fw-semibold" id="welcomeReviewers">Alex Tonog, Jorge De Los Reyes, Alvin Manzano</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="subtle small"># of Test Cases</div>
+                <div class="fw-semibold" id="welcomeCount">8</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="subtle small">Date Last Updated</div>
+                <div class="fw-semibold" id="welcomeUpdated">2026-03-23 20:45</div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+              <button class="btn btn-wtw px-4" id="btnStartReview">
+                <i class="bi bi-play-fill me-1"></i>
+                Start Review
+              </button>
+              <button class="btn btn-wtw-outline px-4" type="button" onclick="alert('Mock action');">
+                View History
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+          <div class="card p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between">
+              <h5 class="mb-0 section-title">What to expect</h5>
+              <i class="bi bi-shield-check" style="color:var(--wtw-purple); font-size: 1.25rem;"></i>
+            </div>
+            <ul class="mt-3 mb-0 subtle">
+              <li>Review test cases in a focused list.</li>
+              <li>See query + parameters clearly in one place.</li>
+              <li>Approve/Reject moves you to the next test case automatically.</li>
+            </ul>
+
+            <hr class="my-4">
+
+            <div class="small subtle">Tip</div>
+            <div class="fw-semibold">Use the burger button <button class="btn btn-sm btn-light border" title="Toggle test case list">
+              <i class="bi bi-list"></i>
+            </button> to collapse the test case list and focus on details.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------
+         SCREEN 2: Review Workbench
+    ----------------------------- -->
+    <section id="screenReview" class="d-none">
+      <!-- Top panel: Test Plan Name -->
+      <div class="card p-3 mb-3">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-light border" id="btnToggleSidebar" title="Toggle test case list">
+              <i class="bi bi-list"></i>
+            </button>
+            <div>
+              <div class="subtle small">Test Plan</div>
+              <div class="fw-bold" id="planTitleTop">Kat ATT Test Plan</div>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="badge badge-soft px-3 py-2" id="progressBadge">0 / 8 reviewed</span>
+            <button class="btn btn-sm btn-light border" id="btnBackToWelcome" title="Back">
+              <i class="bi bi-arrow-left"></i> Back
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="reviewLayout">
+        <div class="review-grid">
+          <!-- Left panel: Test case list -->
+          <aside class="sidebar">
+            <div class="card p-3">
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <div class="subtle small">Queue</div>
+                  <div class="section-title">Test Cases for Review</div>
+                </div>
+                <span class="badge badge-soft" id="pendingCountBadge">Pending: 8</span>
+              </div>
+
+              <div class="mt-3 d-flex gap-2">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-white border"><i class="bi bi-search"></i></span>
+                  <input class="form-control border" id="tcSearch" placeholder="Search test cases...">
+                </div>
+                <button class="btn btn-sm btn-light border" id="btnClearSearch" title="Clear">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+
+              <div class="mt-3 d-flex flex-wrap gap-2">
+                <button class="btn btn-sm btn-light border" data-filter="ALL">All <span class="badge bg-secondary ms-1" id="countAll">0</span></button>
+                <button class="btn btn-sm btn-light border" data-filter="PENDING">Pending <span class="badge bg-warning text-dark ms-1" id="countPending">0</span></button>
+                <button class="btn btn-sm btn-light border" data-filter="APPROVED">Approved <span class="badge bg-success ms-1" id="countApproved">0</span></button>
+                <button class="btn btn-sm btn-light border" data-filter="REJECTED">Rejected <span class="badge bg-danger ms-1" id="countRejected">0</span></button>
+              </div>
+
+              <div class="mt-3 d-grid gap-2" id="tcList"></div>
+            </div>
+          </aside>
+
+          <!-- Right panel: Test case details -->
+          <section>
+            <div class="card p-3">
+              <div class="d-flex align-items-start justify-content-between gap-2">
+                <div>
+                  <div class="subtle small">Selected Test Case</div>
+                  <h5 class="mb-1 section-title" id="tcNameHeading">—</h5>
+                  <div class="small subtle" id="tcMetaLine">Select a test case from the list.</div>
+                </div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-success btn-sm" id="btnApprove" disabled>
+                    <i class="bi bi-check2-circle me-1"></i> Approve
+                  </button>
+                  <button class="btn btn-danger btn-sm" id="btnReject" disabled>
+                    <i class="bi bi-x-circle me-1"></i> Reject
+                  </button>
+                </div>
+              </div>
+
+              <hr class="my-3">
+
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Testcase Name</label>
+                  <input class="form-control" id="fieldName" readonly>
+                </div>
+                <div class="col-12 col-md-3">
+                  <label class="form-label">Testcase Id</label>
+                  <input class="form-control" id="fieldId" readonly>
+                </div>
+                <div class="col-12 col-md-3">
+                  <label class="form-label">Template</label>
+                  <input class="form-control" id="fieldTemplate" readonly>
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <label class="form-label">Status</label>
+                  <input class="form-control" id="fieldStatus" readonly>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-control" id="fieldDesc" rows="3" placeholder="Description..." readonly></textarea>
+                </div>
+
+                <div class="col-12">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <label class="form-label mb-2">Query (SQL)</label>
+                    <div class="small subtle">Syntax-highlighted editor</div>
+                  </div>
+
+                  <!-- Highlighted textarea-like editor -->
+                  <div class="code-editor">
+                    <pre id="queryPre"><code id="queryCode" class="language-sql"></code></pre>
+                    <textarea id="queryTextArea" spellcheck="false" aria-label="SQL query editor"></textarea>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                      <div class="section-title">Parameters</div>
+                      <div class="small subtle">Parameter names used in the query</div>
+                    </div>
+                    <button class="btn btn-sm btn-light border" id="btnAddParam" disabled>
+                      <i class="bi bi-plus-lg me-1"></i> Add row
+                    </button>
+                  </div>
+
+                  <div class="table-responsive mt-2">
+                    <table class="table table-sm align-middle">
+                      <thead>
+                        <tr class="subtle">
+                          <th style="width:45%;">Name</th>
+                          <th style="width:25%;">Data type</th>
+                          <th style="width:30%;">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody id="paramTbody">
+                        <tr><td colspan="3" class="subtle">Select a test case to view parameters.</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div><!-- row -->
+            </div><!-- card -->
+          </section>
+        </div><!-- grid -->
+      </div><!-- layout -->
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // -----------------------------
+    // Mock data (replace with real)
+    // -----------------------------
+    const testPlan = {
+      name: "Kat ATT Test Plan",
+      owner: "Kat",
+      reviewers: ["Alex Tonog", "Jorge De Los Reyes", "Alvin Manzano"],
+      lastUpdated: "2026-03-23 20:45",
+      testCases: [
+        {
+          name: "Group42 - Active Full-Time Resident",
+          id: "TC-1467",
+          template: "Basic Test",
+          status: "PENDING",
+          description: "Validate eligibility rules for active full-time residents.",
+          query:
+`SELECT m.MemberId, m.StatusCode, m.Class
+FROM dbo.Members m
+WHERE m.InYear = '2021'
+  AND m.StatusCode IN ('L','U')
+  AND m.Class IN ('RN','OPT');`,
+          parameters: [
+            { name: "InYear", type: "VARCHAR", value: "2021" },
+            { name: "StatusCode", type: "VARCHAR", value: "L,U" },
+            { name: "Class", type: "VARCHAR", value: "RN,OPT" }
+          ]
+        },
+        {
+          name: "Kat Test Case",
+          id: "TC-1468",
+          template: "Basic Test",
+          status: "PENDING",
+          description: "Verify default case behavior when optional filters are absent.",
+          query:
+`SELECT TOP 100 *
+FROM dbo.Claims c
+WHERE c.PlanYear = @PlanYear
+ORDER BY c.LastUpdated DESC;`,
+          parameters: [
+            { name: "PlanYear", type: "INT", value: "2024" }
+          ]
+        },
+        {
+          name: "Group43 - Active Part Time A",
+          id: "TC-1469",
+          template: "Advanced Test",
+          status: "PENDING",
+          description: "Validate part-time segment A business rules and exclusions.",
+          query:
+`SELECT e.EmployeeId, e.GroupId, e.IsActive
+FROM dbo.Employees e
+WHERE e.GroupId = @GroupId
+  AND e.IsActive = 1;`,
+          parameters: [
+            { name: "GroupId", type: "SMALLINT", value: "-1" }
+          ]
+        },
+        // add more to match desired volume (mock)
+        ...Array.from({length: 5}).map((_, i) => ({
+          name: `Additional Test Case ${i+1}`,
+          id: `TC-147${i}`,
+          template: i % 2 ? "Basic Test" : "Advanced Test",
+          status: "PENDING",
+          description: "Mock description for additional test cases.",
+          query:
+`SELECT *
+FROM dbo.Table${i+1} t
+WHERE t.Flag = 1;`,
+          parameters: [
+            { name: "Flag", type: "BIT", value: "1" }
+          ]
+        }))
+      ]
+    };
+
+    // -----------------------------
+    // State
+    // -----------------------------
+    let selectedIndex = -1;
+    let currentFilter = "ALL";
+    let searchText = "";
+
+    // -----------------------------
+    // Elements
+    // -----------------------------
+    const screenWelcome = document.getElementById("screenWelcome");
+    const screenReview  = document.getElementById("screenReview");
+    const appRoot = document.getElementById("appRoot");
+
+    const btnStartReview = document.getElementById("btnStartReview");
+    const btnBackToWelcome = document.getElementById("btnBackToWelcome");
+    const btnToggleSidebar = document.getElementById("btnToggleSidebar");
+
+    const tcList = document.getElementById("tcList");
+    const tcSearch = document.getElementById("tcSearch");
+    const btnClearSearch = document.getElementById("btnClearSearch");
+
+    const progressBadge = document.getElementById("progressBadge");
+    const pendingCountBadge = document.getElementById("pendingCountBadge");
+
+    const btnApprove = document.getElementById("btnApprove");
+    const btnReject = document.getElementById("btnReject");
+    const btnAddParam = document.getElementById("btnAddParam");
+
+    const tcNameHeading = document.getElementById("tcNameHeading");
+    const tcMetaLine = document.getElementById("tcMetaLine");
+
+    const fieldName = document.getElementById("fieldName");
+    const fieldId = document.getElementById("fieldId");
+    const fieldTemplate = document.getElementById("fieldTemplate");
+    const fieldStatus = document.getElementById("fieldStatus");
+    const fieldDesc = document.getElementById("fieldDesc");
+
+    const queryTextArea = document.getElementById("queryTextArea");
+    const queryCode = document.getElementById("queryCode");
+    const queryPre = document.getElementById("queryPre");
+    const paramTbody = document.getElementById("paramTbody");
+
+    // Welcome fields
+    document.getElementById("welcomeOwner").textContent = testPlan.owner;
+    document.getElementById("welcomeReviewers").textContent = testPlan.reviewers.join(", ");
+    document.getElementById("welcomeCount").textContent = testPlan.testCases.length;
+    document.getElementById("welcomeUpdated").textContent = testPlan.lastUpdated;
+    document.getElementById("planTitleTop").textContent = testPlan.name;
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    function statusBadgeClass(status){
+      if(status === "APPROVED") return "badge-approved";
+      if(status === "REJECTED") return "badge-rejected";
+      return "badge-pending";
+    }
+
+    function reviewedCount(){
+      return testPlan.testCases.filter(tc => tc.status === "APPROVED" || tc.status === "REJECTED").length;
+    }
+
+    function pendingCount(){
+      return testPlan.testCases.filter(tc => tc.status === "PENDING").length;
+    }
+
+    function approvedCount(){
+      return testPlan.testCases.filter(tc => tc.status === "APPROVED").length;
+    }
+
+    function rejectedCount(){
+      return testPlan.testCases.filter(tc => tc.status === "REJECTED").length;
+    }
+
+    function updateFilterCounts(){
+      const countAll = document.getElementById("countAll");
+      const countPending = document.getElementById("countPending");
+      const countApproved = document.getElementById("countApproved");
+      const countRejected = document.getElementById("countRejected");
+
+      if(countAll) countAll.textContent = testPlan.testCases.length;
+      if(countPending) countPending.textContent = pendingCount();
+      if(countApproved) countApproved.textContent = approvedCount();
+      if(countRejected) countRejected.textContent = rejectedCount();
+    }
+
+    function updateTopBadges(){
+      progressBadge.textContent = `${reviewedCount()} / ${testPlan.testCases.length} reviewed`;
+      pendingCountBadge.textContent = `Pending: ${pendingCount()}`;
+      updateFilterCounts();
+    }
+
+    function getVisibleIndexes(){
+      return testPlan.testCases
+        .map((tc, idx) => ({tc, idx}))
+        .filter(({tc}) => {
+          if(currentFilter === "PENDING" && tc.status !== "PENDING") return false;
+          if(currentFilter === "APPROVED" && tc.status !== "APPROVED") return false;
+          if(currentFilter === "REJECTED" && tc.status !== "REJECTED") return false;
+          return true;
+        })
+        .filter(({tc}) => {
+          if(!searchText.trim()) return true;
+          const s = searchText.toLowerCase();
+          return (tc.name.toLowerCase().includes(s) || tc.id.toLowerCase().includes(s));
+        })
+        .map(x => x.idx);
+    }
+
+    function renderList(){
+      const visible = getVisibleIndexes();
+
+      tcList.innerHTML = "";
+      if(visible.length === 0){
+        tcList.innerHTML = `<div class="subtle small">No test cases match your filter/search.</div>`;
+        return;
+      }
+
+      visible.forEach(idx => {
+        const tc = testPlan.testCases[idx];
+        const row = document.createElement("div");
+        row.className = "tc-row";
+        if(idx === selectedIndex) row.classList.add("active");
+
+        row.innerHTML = `
+          <div class="d-flex justify-content-between align-items-start gap-2">
+            <div>
+              <div class="fw-semibold">${escapeHtml(tc.name)}</div>
+              <div class="small subtle">${escapeHtml(tc.id)} • ${escapeHtml(tc.template)}</div>
+            </div>
+            <span class="badge ${statusBadgeClass(tc.status)}">${tc.status}</span>
+          </div>
+        `;
+
+        row.addEventListener("click", () => selectTestCase(idx));
+        tcList.appendChild(row);
+      });
+    }
+
+    function selectTestCase(idx){
+      selectedIndex = idx;
+      const tc = testPlan.testCases[idx];
+
+      // enable actions
+      btnApprove.disabled = false;
+      btnReject.disabled = false;
+      btnAddParam.disabled = false;
+
+      // Header
+      tcNameHeading.textContent = tc.name;
+      tcMetaLine.textContent = `${tc.id} • ${tc.template}`;
+
+      // Fields
+      fieldName.value = tc.name;
+      fieldId.value = tc.id;
+      fieldTemplate.value = tc.template;
+      fieldStatus.value = tc.status;
+      fieldDesc.value = tc.description;
+
+      // Query editor
+      queryTextArea.value = tc.query;
+      syncAndHighlightQuery();
+
+      // Parameters
+      renderParams(tc.parameters);
+
+      renderList();
+    }
+
+    function renderParams(params){
+      paramTbody.innerHTML = "";
+      params.forEach((p, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><input class="form-control form-control-sm" value="${escapeAttr(p.name)}"></td>
+          <td><input class="form-control form-control-sm" value="${escapeAttr(p.type)}"></td>
+          <td><input class="form-control form-control-sm" value="${escapeAttr(p.value)}"></td>
+        `;
+        // Keep the mock interactive (edit in place)
+        const inputs = tr.querySelectorAll("input");
+        inputs[0].addEventListener("input", e => params[i].name = e.target.value);
+        inputs[1].addEventListener("input", e => params[i].type = e.target.value);
+        inputs[2].addEventListener("input", e => params[i].value = e.target.value);
+
+        paramTbody.appendChild(tr);
+      });
+    }
+
+    function syncAndHighlightQuery(){
+      // copy textarea value into code block and highlight
+      queryCode.textContent = queryTextArea.value || "";
+      queryCode.removeAttribute('data-highlighted');
+      hljs.highlightElement(queryCode);
+
+      // keep scroll in sync
+      queryPre.scrollTop = queryTextArea.scrollTop;
+      queryPre.scrollLeft = queryTextArea.scrollLeft;
+    }
+
+    function moveToNextAfterDecision(){
+      const visible = getVisibleIndexes();
+      if(visible.length === 0){
+        selectedIndex = -1;
+        clearDetails();
+        renderList();
+        return;
+      }
+
+      // Find selected in visible list; move to next
+      const pos = visible.indexOf(selectedIndex);
+      const nextPos = (pos >= 0 && pos < visible.length - 1) ? pos + 1 : 0;
+      selectTestCase(visible[nextPos]);
+    }
+
+    function clearDetails(){
+      btnApprove.disabled = true;
+      btnReject.disabled = true;
+      btnAddParam.disabled = true;
+
+      tcNameHeading.textContent = "—";
+      tcMetaLine.textContent = "Select a test case from the list.";
+      fieldName.value = "";
+      fieldId.value = "";
+      fieldTemplate.value = "";
+      fieldStatus.value = "";
+      fieldDesc.value = "";
+      queryTextArea.value = "";
+      syncAndHighlightQuery();
+      paramTbody.innerHTML = `<tr><td colspan="3" class="subtle">Select a test case to view parameters.</td></tr>`;
+    }
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, s => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[s]));
+    }
+    function escapeAttr(str){ return escapeHtml(str); }
+
+    // -----------------------------
+    // Event wiring
+    // -----------------------------
+    btnStartReview.addEventListener("click", () => {
+      screenWelcome.classList.add("d-none");
+      screenReview.classList.remove("d-none");
+
+      updateTopBadges();
+      updateFilterCounts();
+      renderList();
+
+      // auto-select first visible item
+      const visible = getVisibleIndexes();
+      if(visible.length > 0) selectTestCase(visible[0]);
+      else clearDetails();
+    });
+
+    btnBackToWelcome.addEventListener("click", () => {
+      screenReview.classList.add("d-none");
+      screenWelcome.classList.remove("d-none");
+    });
+
+    btnToggleSidebar.addEventListener("click", () => {
+      appRoot.classList.toggle("sidebar-collapsed");
+    });
+
+    // Filter buttons
+    document.querySelectorAll("[data-filter]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentFilter = btn.getAttribute("data-filter");
+        renderList();
+
+        // if current selection not visible, pick first visible
+        const visible = getVisibleIndexes();
+        if(!visible.includes(selectedIndex)){
+          if(visible.length > 0) selectTestCase(visible[0]);
+          else { selectedIndex = -1; clearDetails(); }
+        }
+      });
+    });
+
+    // Search
+    tcSearch.addEventListener("input", () => {
+      searchText = tcSearch.value;
+      renderList();
+    });
+    btnClearSearch.addEventListener("click", () => {
+      tcSearch.value = "";
+      searchText = "";
+      renderList();
+    });
+
+    // Query editor sync
+    queryTextArea.addEventListener("input", () => {
+      if(selectedIndex < 0) return;
+      testPlan.testCases[selectedIndex].query = queryTextArea.value;
+      syncAndHighlightQuery();
+    });
+    queryTextArea.addEventListener("scroll", syncAndHighlightQuery);
+
+    // Approve/Reject
+    btnApprove.addEventListener("click", () => {
+      if(selectedIndex < 0) return;
+      testPlan.testCases[selectedIndex].status = "APPROVED";
+      fieldStatus.value = "APPROVED";
+      updateTopBadges();
+      renderList();
+      moveToNextAfterDecision();
+    });
+
+    btnReject.addEventListener("click", () => {
+      if(selectedIndex < 0) return;
+      testPlan.testCases[selectedIndex].status = "REJECTED";
+      fieldStatus.value = "REJECTED";
+      updateTopBadges();
+      renderList();
+      moveToNextAfterDecision();
+    });
+
+    // Add parameter row
+    btnAddParam.addEventListener("click", () => {
+      if(selectedIndex < 0) return;
+      const tc = testPlan.testCases[selectedIndex];
+      tc.parameters.push({ name: "NewParam", type: "VARCHAR", value: "" });
+      renderParams(tc.parameters);
+    });
+
+    // SQL language is already loaded via CDN script tag above
+  </script>
+</body>
+</html>
