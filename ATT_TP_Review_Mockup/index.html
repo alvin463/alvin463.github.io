@@ -11,14 +11,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
   <!-- Highlight.js (SQL) -->
-  <!-- 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
-  
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/sql.min.js"></script>
- -->
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/default.min.css">
+  <!-- Using dark theme for better contrast with dark background -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css">
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
 
 <!-- and it's easy to individually load additional languages -->
@@ -114,7 +108,7 @@
     .review-grid{
       display: grid;
       grid-template-columns: 36% 64%;
-      gap: 14px;
+      /* gap: 14px; */
       height: 100%;
       align-items: stretch;
     }
@@ -125,9 +119,10 @@
 
     .sidebar{
       height: 100%;
-      overflow-y: auto;
+      overflow-y: scroll; /* Changed from auto to scroll */
       overflow-x: hidden;
       transition: width .2s ease, opacity .2s ease;
+      scrollbar-gutter: stable; /* Reserve space for scrollbar */
     }
 
     .sidebar-collapsed .sidebar{
@@ -139,8 +134,42 @@
     /* Scrollable main panel */
     .main-panel{
       height: 100%;
-      overflow-y: auto;
+      overflow-y: scroll; /* Changed from auto to scroll to always show scrollbar */
       overflow-x: hidden;
+      scrollbar-gutter: stable; /* Reserve space for scrollbar */
+    }
+
+    /* Custom thin scrollbars for sidebar and main panel */
+    .sidebar,
+    .main-panel{
+      scrollbar-width: thin; /* Firefox */
+      scrollbar-color: rgba(0,0,0,0.5) rgba(0,0,0,0.1); /* Firefox: thumb, track */
+    }
+
+    /* Webkit browsers (Chrome, Edge, Safari) */
+    .sidebar::-webkit-scrollbar,
+    .main-panel::-webkit-scrollbar{
+      width: 10px;
+    }
+
+    .sidebar::-webkit-scrollbar-track,
+    .main-panel::-webkit-scrollbar-track{
+      background: rgba(0,0,0,0.05);
+      border-radius: 5px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb,
+    .main-panel::-webkit-scrollbar-thumb{
+      background: rgba(0,0,0,0.4);
+      border-radius: 5px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover,
+    .main-panel::-webkit-scrollbar-thumb:hover{
+      background: rgba(0,0,0,0.6);
+      background-clip: padding-box;
     }
 
     /* Test case list */
@@ -214,10 +243,176 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
 
+    /* Custom scrollbar for code editor */
+    .code-editor pre{
+      scrollbar-width: thin; /* Firefox */
+      scrollbar-color: rgba(255,255,255,0.4) rgba(255,255,255,0.1); /* Firefox: lighter for dark background */
+    }
+
+    .code-editor pre::-webkit-scrollbar{
+      width: 10px;
+      height: 10px;
+    }
+
+    .code-editor pre::-webkit-scrollbar-track{
+      background: rgba(255,255,255,0.05);
+      border-radius: 5px;
+    }
+
+    .code-editor pre::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,0.3);
+      border-radius: 5px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .code-editor pre::-webkit-scrollbar-thumb:hover{
+      background: rgba(255,255,255,0.5);
+      background-clip: padding-box;
+    }
+
     /* Form field emphasis */
     .form-label{
       font-weight: 600;
       color: #374151;
+    }
+
+    /* Fullscreen SQL Modal */
+    .fullscreen-modal{
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0);
+      z-index: 9999;
+      padding: 20px;
+      overflow: auto;
+      opacity: 0;
+      transition: opacity 0.15s linear, background 0.15s linear;
+    }
+    .fullscreen-modal.active{
+      display: block;
+    }
+    .fullscreen-modal.show{
+      opacity: 1;
+      background: rgba(0,0,0,0.95);
+    }
+    .fullscreen-modal-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      color: #fff;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .fullscreen-modal.show .fullscreen-modal-header{
+      transform: scale(1);
+    }
+    .fullscreen-modal-body{
+      height: calc(100vh - 100px);
+      transform: scale(0.9);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s linear;
+    }
+    .fullscreen-modal.show .fullscreen-modal-body{
+      transform: scale(1);
+      opacity: 1;
+    }
+    .fullscreen-code-editor{
+      position: relative;
+      border: 1px solid #333;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0b1020;
+      height: 100%;
+    }
+    .fullscreen-code-editor pre{
+      margin: 0;
+      padding: 20px;
+      height: 100%;
+      overflow: auto;
+      font-size: 16px;
+      line-height: 1.6;
+      background: transparent;
+    }
+    .fullscreen-code-editor textarea{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      resize: none;
+      padding: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+      background: transparent;
+      color: transparent;
+      caret-color: #ffffff;
+      outline: none;
+      overflow: auto;
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Fullscreen Parameters Table */
+    .fullscreen-params-container{
+      background: var(--wtw-surface);
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 20px;
+      height: 100%;
+      overflow: auto;
+    }
+    .fullscreen-params-container .table{
+      font-size: 15px;
+      margin-bottom: 0;
+    }
+    .fullscreen-params-container .table th{
+      position: sticky;
+      top: 0;
+      background: var(--wtw-bg);
+      z-index: 10;
+      padding: 12px;
+    }
+    .fullscreen-params-container .table td{
+      padding: 10px 12px;
+    }
+    .fullscreen-params-container .form-control{
+      font-size: 15px;
+      padding: 8px 12px;
+    }
+
+    /* Custom scrollbars for fullscreen modals */
+    .fullscreen-code-editor pre,
+    .fullscreen-params-container{
+      scrollbar-width: thin; /* Firefox */
+      scrollbar-color: rgba(255,255,255,0.4) rgba(255,255,255,0.1); /* Firefox: thumb, track - lighter for dark background */
+    }
+
+    .fullscreen-code-editor pre::-webkit-scrollbar,
+    .fullscreen-params-container::-webkit-scrollbar{
+      width: 10px;
+      height: 10px;
+    }
+
+    .fullscreen-code-editor pre::-webkit-scrollbar-track,
+    .fullscreen-params-container::-webkit-scrollbar-track{
+      background: rgba(255,255,255,0.05);
+      border-radius: 5px;
+    }
+
+    .fullscreen-code-editor pre::-webkit-scrollbar-thumb,
+    .fullscreen-params-container::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,0.3);
+      border-radius: 5px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .fullscreen-code-editor pre::-webkit-scrollbar-thumb:hover,
+    .fullscreen-params-container::-webkit-scrollbar-thumb:hover{
+      background: rgba(255,255,255,0.5);
+      background-clip: padding-box;
     }
 
     /* Responsive: stack on narrow */
@@ -366,7 +561,7 @@
       <div id="reviewLayout">
         <div class="review-grid">
           <!-- Left panel: Test case list -->
-          <aside class="sidebar">
+          <aside class="sidebar me-2">
             <div class="card p-3">
               <div class="d-flex align-items-center justify-content-between">
                 <div>
@@ -432,7 +627,7 @@
                   <input class="form-control" id="fieldTemplate" readonly>
                 </div>
 
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-md-4 visually-hidden">
                   <label class="form-label">Status</label>
                   <input class="form-control" id="fieldStatus" readonly>
                 </div>
@@ -442,16 +637,23 @@
                   <textarea class="form-control" id="fieldDesc" rows="3" placeholder="Description..." readonly></textarea>
                 </div>
 
+                
+
                 <div class="col-12">
                   <div class="d-flex align-items-center justify-content-between">
                     <label class="form-label mb-2">Query (SQL)</label>
-                    <div class="small subtle">Syntax-highlighted editor</div>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="small subtle">&nbsp;</div>
+                      <button class="btn btn-sm btn-light border" id="btnMaximizeQuery" title="Maximize query view" disabled>
+                        <i class="bi bi-arrows-fullscreen"></i>
+                      </button>
+                    </div>
                   </div>
 
                   <!-- Highlighted textarea-like editor -->
                   <div class="code-editor">
                     <pre id="queryPre"><code id="queryCode" class="language-sql"></code></pre>
-                    <textarea id="queryTextArea" spellcheck="false" aria-label="SQL query editor"></textarea>
+                    <textarea id="queryTextArea" spellcheck="false" aria-label="SQL query editor" disabled></textarea>
                   </div>
                 </div>
 
@@ -461,9 +663,14 @@
                       <div class="section-title">Parameters</div>
                       <div class="small subtle">Parameter names used in the query</div>
                     </div>
-                    <button class="btn btn-sm btn-light border" id="btnAddParam" disabled>
-                      <i class="bi bi-plus-lg me-1"></i> Add row
-                    </button>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-sm btn-light border" id="btnMaximizeParams" title="Maximize parameters view" disabled>
+                        <i class="bi bi-arrows-fullscreen"></i>
+                      </button>
+                      <button class="btn btn-sm btn-light border" id="btnAddParam" disabled>
+                        <i class="bi bi-plus-lg me-1"></i> Add row
+                      </button>
+                    </div>
                   </div>
 
                   <div class="table-responsive mt-2">
@@ -482,12 +689,105 @@
                   </div>
                 </div>
 
+                <div class="col-12" id="reviewCommentSection" style="display:none;">
+                  <label class="form-label">
+                    <i class="bi bi-chat-left-text me-1"></i>Review Comment
+                  </label>
+                  <div class="alert alert-light border mb-0">
+                    <div class="small" id="fieldReviewComment" style="white-space: pre-wrap;">—</div>
+                  </div>
+                </div>
+                
               </div><!-- row -->
             </div><!-- card -->
           </section>
         </div><!-- grid -->
       </div><!-- layout -->
     </section>
+
+    <!-- Review Comment Modal -->
+    <div class="modal fade" id="reviewCommentModal" tabindex="-1" aria-labelledby="reviewCommentModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="reviewCommentModalLabel">Add Review Comment</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="reviewCommentText" class="form-label">Comment <span class="text-muted">(optional)</span></label>
+              <textarea class="form-control" id="reviewCommentText" rows="4" placeholder="Enter your review comments here..."></textarea>
+              <div class="form-text">This comment will be saved with your decision.</div>
+            </div>
+            <div class="alert alert-info mb-0 d-flex align-items-start gap-2">
+              <i class="bi bi-info-circle-fill"></i>
+              <div>
+                <strong id="reviewActionLabel">Approving:</strong>
+                <div class="small" id="reviewTestCaseName">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-wtw" id="btnConfirmReview">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fullscreen SQL Query Modal -->
+    <div class="fullscreen-modal" id="fullscreenSqlModal">
+      <div class="fullscreen-modal-header">
+        <div>
+          <h4 class="mb-1">SQL Query - <span id="fullscreenTestCaseName">—</span></h4>
+          <div class="small text-muted">Full screen view</div>
+        </div>
+        <button class="btn btn-light" id="btnCloseFullscreen" title="Close fullscreen (ESC)">
+          <i class="bi bi-x-lg me-1"></i> Close
+        </button>
+      </div>
+      <div class="fullscreen-modal-body">
+        <div class="fullscreen-code-editor">
+          <pre id="fullscreenQueryPre"><code id="fullscreenQueryCode" class="language-sql"></code></pre>
+          <textarea id="fullscreenQueryTextArea" spellcheck="false" aria-label="SQL query editor fullscreen" disabled></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fullscreen Parameters Modal -->
+    <div class="fullscreen-modal" id="fullscreenParamsModal">
+      <div class="fullscreen-modal-header">
+        <div>
+          <h4 class="mb-1">Parameters - <span id="fullscreenParamsTestCaseName">—</span></h4>
+          <div class="small text-muted">Full screen view</div>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-success btn-sm" id="btnAddParamFullscreen">
+            <i class="bi bi-plus-lg me-1"></i> Add Parameter
+          </button>
+          <button class="btn btn-light" id="btnCloseFullscreenParams" title="Close fullscreen (ESC)">
+            <i class="bi bi-x-lg me-1"></i> Close
+          </button>
+        </div>
+      </div>
+      <div class="fullscreen-modal-body">
+        <div class="fullscreen-params-container">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr class="subtle">
+                <th style="width:40%;">Name</th>
+                <th style="width:25%;">Data type</th>
+                <th style="width:30%;">Value</th>
+                <th style="width:5%;"></th>
+              </tr>
+            </thead>
+            <tbody id="fullscreenParamTbody">
+              <tr><td colspan="4" class="subtle text-center">No parameters</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -518,7 +818,8 @@ WHERE m.InYear = '2021'
             { name: "InYear", type: "VARCHAR", value: "2021" },
             { name: "StatusCode", type: "VARCHAR", value: "L,U" },
             { name: "Class", type: "VARCHAR", value: "RN,OPT" }
-          ]
+          ],
+          reviewComment: ""
         },
         {
           name: "Kat Test Case",
@@ -533,7 +834,8 @@ WHERE c.PlanYear = @PlanYear
 ORDER BY c.LastUpdated DESC;`,
           parameters: [
             { name: "PlanYear", type: "INT", value: "2024" }
-          ]
+          ],
+          reviewComment: ""
         },
         {
           name: "Group43 - Active Part Time A",
@@ -548,7 +850,8 @@ WHERE e.GroupId = @GroupId
   AND e.IsActive = 1;`,
           parameters: [
             { name: "GroupId", type: "SMALLINT", value: "-1" }
-          ]
+          ],
+          reviewComment: ""
         },
         // add more to match desired volume (mock)
         ...Array.from({length: 5}).map((_, i) => ({
@@ -563,7 +866,8 @@ FROM dbo.Table${i+1} t
 WHERE t.Flag = 1;`,
           parameters: [
             { name: "Flag", type: "BIT", value: "1" }
-          ]
+          ],
+          reviewComment: ""
         }))
       ]
     };
@@ -574,6 +878,7 @@ WHERE t.Flag = 1;`,
     let selectedIndex = -1;
     let currentFilter = "ALL";
     let searchText = "";
+    let pendingReviewAction = null; // "APPROVED" or "REJECTED"
 
     // -----------------------------
     // Elements
@@ -605,11 +910,37 @@ WHERE t.Flag = 1;`,
     const fieldTemplate = document.getElementById("fieldTemplate");
     const fieldStatus = document.getElementById("fieldStatus");
     const fieldDesc = document.getElementById("fieldDesc");
+    const fieldReviewComment = document.getElementById("fieldReviewComment");
+    const reviewCommentSection = document.getElementById("reviewCommentSection");
 
     const queryTextArea = document.getElementById("queryTextArea");
     const queryCode = document.getElementById("queryCode");
     const queryPre = document.getElementById("queryPre");
     const paramTbody = document.getElementById("paramTbody");
+
+    // Review comment modal elements
+    const reviewCommentModal = new bootstrap.Modal(document.getElementById("reviewCommentModal"));
+    const reviewCommentText = document.getElementById("reviewCommentText");
+    const reviewActionLabel = document.getElementById("reviewActionLabel");
+    const reviewTestCaseName = document.getElementById("reviewTestCaseName");
+    const btnConfirmReview = document.getElementById("btnConfirmReview");
+
+    // Fullscreen SQL modal elements
+    const fullscreenSqlModal = document.getElementById("fullscreenSqlModal");
+    const fullscreenQueryTextArea = document.getElementById("fullscreenQueryTextArea");
+    const fullscreenQueryCode = document.getElementById("fullscreenQueryCode");
+    const fullscreenQueryPre = document.getElementById("fullscreenQueryPre");
+    const fullscreenTestCaseName = document.getElementById("fullscreenTestCaseName");
+    const btnMaximizeQuery = document.getElementById("btnMaximizeQuery");
+    const btnCloseFullscreen = document.getElementById("btnCloseFullscreen");
+
+    // Fullscreen Parameters modal elements
+    const fullscreenParamsModal = document.getElementById("fullscreenParamsModal");
+    const fullscreenParamTbody = document.getElementById("fullscreenParamTbody");
+    const fullscreenParamsTestCaseName = document.getElementById("fullscreenParamsTestCaseName");
+    const btnMaximizeParams = document.getElementById("btnMaximizeParams");
+    const btnCloseFullscreenParams = document.getElementById("btnCloseFullscreenParams");
+    const btnAddParamFullscreen = document.getElementById("btnAddParamFullscreen");
 
     // Welcome fields
     document.getElementById("welcomeOwner").textContent = testPlan.owner;
@@ -693,10 +1024,13 @@ WHERE t.Flag = 1;`,
         row.className = "tc-row";
         if(idx === selectedIndex) row.classList.add("active");
 
+        const hasComment = tc.reviewComment && tc.reviewComment.trim();
+        const commentIcon = hasComment ? '<i class="bi bi-chat-left-text-fill text-muted ms-1" title="Has review comment"></i>' : '';
+
         row.innerHTML = `
           <div class="d-flex justify-content-between align-items-start gap-2">
             <div>
-              <div class="fw-semibold">${escapeHtml(tc.name)}</div>
+              <div class="fw-semibold">${escapeHtml(tc.name)} ${commentIcon}</div>
               <div class="small subtle">${escapeHtml(tc.id)} • ${escapeHtml(tc.template)}</div>
             </div>
             <span class="badge ${statusBadgeClass(tc.status)}">${tc.status}</span>
@@ -716,10 +1050,12 @@ WHERE t.Flag = 1;`,
       btnApprove.disabled = false;
       btnReject.disabled = false;
       btnAddParam.disabled = false;
+      btnMaximizeQuery.disabled = false;
+      btnMaximizeParams.disabled = false;
 
       // Header
       tcNameHeading.textContent = tc.name;
-      tcMetaLine.textContent = `${tc.id} • ${tc.template}`;
+      tcMetaLine.textContent = `${tc.id} • ${tc.template} • ${tc.status}`;
 
       // Fields
       fieldName.value = tc.name;
@@ -727,6 +1063,14 @@ WHERE t.Flag = 1;`,
       fieldTemplate.value = tc.template;
       fieldStatus.value = tc.status;
       fieldDesc.value = tc.description;
+
+      // Review comment (show only if exists)
+      if(tc.reviewComment && tc.reviewComment.trim()){
+        fieldReviewComment.textContent = tc.reviewComment;
+        reviewCommentSection.style.display = "block";
+      } else {
+        reviewCommentSection.style.display = "none";
+      }
 
       // Query editor
       queryTextArea.value = tc.query;
@@ -768,6 +1112,125 @@ WHERE t.Flag = 1;`,
       queryPre.scrollLeft = queryTextArea.scrollLeft;
     }
 
+    function syncAndHighlightFullscreenQuery(){
+      // copy textarea value into code block and highlight for fullscreen
+      fullscreenQueryCode.textContent = fullscreenQueryTextArea.value || "";
+      fullscreenQueryCode.removeAttribute('data-highlighted');
+      hljs.highlightElement(fullscreenQueryCode);
+
+      // keep scroll in sync
+      fullscreenQueryPre.scrollTop = fullscreenQueryTextArea.scrollTop;
+      fullscreenQueryPre.scrollLeft = fullscreenQueryTextArea.scrollLeft;
+    }
+
+    function openFullscreenQuery(){
+      if(selectedIndex < 0) return;
+      const tc = testPlan.testCases[selectedIndex];
+      
+      fullscreenTestCaseName.textContent = `${tc.id} - ${tc.name}`;
+      fullscreenQueryTextArea.value = tc.query;
+      syncAndHighlightFullscreenQuery();
+      
+      fullscreenSqlModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      // Trigger animation with slight delay
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          fullscreenSqlModal.classList.add('show');
+        });
+      });
+    }
+
+    function closeFullscreenQuery(){
+      // Remove animation class first
+      fullscreenSqlModal.classList.remove('show');
+      
+      // Wait for animation to complete before hiding
+      setTimeout(() => {
+        // Save changes back to the test case
+        if(selectedIndex >= 0){
+          testPlan.testCases[selectedIndex].query = fullscreenQueryTextArea.value;
+          queryTextArea.value = fullscreenQueryTextArea.value;
+          syncAndHighlightQuery();
+        }
+        
+        fullscreenSqlModal.classList.remove('active');
+        document.body.style.overflow = '';
+      }, 300); // Match transition duration
+    }
+
+    function renderFullscreenParams(params){
+      fullscreenParamTbody.innerHTML = "";
+      if(!params || params.length === 0){
+        fullscreenParamTbody.innerHTML = `<tr><td colspan="4" class="subtle text-center">No parameters</td></tr>`;
+        return;
+      }
+
+      params.forEach((p, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><input class="form-control" value="${escapeAttr(p.name)}"></td>
+          <td><input class="form-control" value="${escapeAttr(p.type)}"></td>
+          <td><input class="form-control" value="${escapeAttr(p.value)}"></td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-danger" title="Delete parameter">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        `;
+        
+        const inputs = tr.querySelectorAll("input");
+        inputs[0].addEventListener("input", e => params[i].name = e.target.value);
+        inputs[1].addEventListener("input", e => params[i].type = e.target.value);
+        inputs[2].addEventListener("input", e => params[i].value = e.target.value);
+        
+        const btnDelete = tr.querySelector("button");
+        btnDelete.addEventListener("click", () => {
+          params.splice(i, 1);
+          renderFullscreenParams(params);
+          renderParams(params); // Sync with main view
+        });
+
+        fullscreenParamTbody.appendChild(tr);
+      });
+    }
+
+    function openFullscreenParams(){
+      if(selectedIndex < 0) return;
+      const tc = testPlan.testCases[selectedIndex];
+      
+      fullscreenParamsTestCaseName.textContent = `${tc.id} - ${tc.name}`;
+      renderFullscreenParams(tc.parameters);
+      
+      fullscreenParamsModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      // Trigger animation with slight delay
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          fullscreenParamsModal.classList.add('show');
+        });
+      });
+    }
+
+    function closeFullscreenParams(){
+      // Remove animation class first
+      fullscreenParamsModal.classList.remove('show');
+      
+      // Wait for animation to complete before hiding
+      setTimeout(() => {
+        // Sync back to the main parameter table
+        if(selectedIndex >= 0){
+          const tc = testPlan.testCases[selectedIndex];
+          renderParams(tc.parameters);
+        }
+        
+        fullscreenParamsModal.classList.remove('active');
+        document.body.style.overflow = '';
+      }, 300); // Match transition duration
+    }
+
     function moveToNextAfterDecision(){
       const visible = getVisibleIndexes();
       if(visible.length === 0){
@@ -787,6 +1250,8 @@ WHERE t.Flag = 1;`,
       btnApprove.disabled = true;
       btnReject.disabled = true;
       btnAddParam.disabled = true;
+      btnMaximizeQuery.disabled = true;
+      btnMaximizeParams.disabled = true;
 
       tcNameHeading.textContent = "—";
       tcMetaLine.textContent = "Select a test case from the list.";
@@ -795,6 +1260,7 @@ WHERE t.Flag = 1;`,
       fieldTemplate.value = "";
       fieldStatus.value = "";
       fieldDesc.value = "";
+      reviewCommentSection.style.display = "none";
       queryTextArea.value = "";
       syncAndHighlightQuery();
       paramTbody.innerHTML = `<tr><td colspan="3" class="subtle">Select a test case to view parameters.</td></tr>`;
@@ -867,23 +1333,51 @@ WHERE t.Flag = 1;`,
     });
     queryTextArea.addEventListener("scroll", syncAndHighlightQuery);
 
-    // Approve/Reject
+    // Approve/Reject - Open Modal
     btnApprove.addEventListener("click", () => {
       if(selectedIndex < 0) return;
-      testPlan.testCases[selectedIndex].status = "APPROVED";
-      fieldStatus.value = "APPROVED";
-      updateTopBadges();
-      renderList();
-      moveToNextAfterDecision();
+      const tc = testPlan.testCases[selectedIndex];
+      pendingReviewAction = "APPROVED";
+      reviewActionLabel.textContent = "Approving:";
+      reviewActionLabel.parentElement.parentElement.classList.remove("alert-danger");
+      reviewActionLabel.parentElement.parentElement.classList.add("alert-success");
+      reviewTestCaseName.textContent = `${tc.id} - ${tc.name}`;
+      reviewCommentText.value = tc.reviewComment || "";
+      reviewCommentModal.show();
     });
 
     btnReject.addEventListener("click", () => {
       if(selectedIndex < 0) return;
-      testPlan.testCases[selectedIndex].status = "REJECTED";
-      fieldStatus.value = "REJECTED";
+      const tc = testPlan.testCases[selectedIndex];
+      pendingReviewAction = "REJECTED";
+      reviewActionLabel.textContent = "Rejecting:";
+      reviewActionLabel.parentElement.parentElement.classList.remove("alert-success");
+      reviewActionLabel.parentElement.parentElement.classList.add("alert-danger");
+      reviewTestCaseName.textContent = `${tc.id} - ${tc.name}`;
+      reviewCommentText.value = tc.reviewComment || "";
+      reviewCommentModal.show();
+    });
+
+    // Confirm Review Action from Modal
+    btnConfirmReview.addEventListener("click", () => {
+      if(selectedIndex < 0 || !pendingReviewAction) return;
+      
+      // Save the review comment and status
+      testPlan.testCases[selectedIndex].status = pendingReviewAction;
+      testPlan.testCases[selectedIndex].reviewComment = reviewCommentText.value.trim();
+      fieldStatus.value = pendingReviewAction;
+      
+      // Update UI
       updateTopBadges();
       renderList();
+      
+      // Close modal and move to next
+      reviewCommentModal.hide();
       moveToNextAfterDecision();
+      
+      // Reset
+      pendingReviewAction = null;
+      reviewCommentText.value = "";
     });
 
     // Add parameter row
@@ -892,6 +1386,39 @@ WHERE t.Flag = 1;`,
       const tc = testPlan.testCases[selectedIndex];
       tc.parameters.push({ name: "NewParam", type: "VARCHAR", value: "" });
       renderParams(tc.parameters);
+    });
+
+    // Fullscreen SQL Query
+    btnMaximizeQuery.addEventListener("click", openFullscreenQuery);
+    btnCloseFullscreen.addEventListener("click", closeFullscreenQuery);
+
+    // Fullscreen query editor sync
+    fullscreenQueryTextArea.addEventListener("input", () => {
+      syncAndHighlightFullscreenQuery();
+    });
+    fullscreenQueryTextArea.addEventListener("scroll", syncAndHighlightFullscreenQuery);
+
+    // Fullscreen Parameters
+    btnMaximizeParams.addEventListener("click", openFullscreenParams);
+    btnCloseFullscreenParams.addEventListener("click", closeFullscreenParams);
+    
+    // Add parameter in fullscreen
+    btnAddParamFullscreen.addEventListener("click", () => {
+      if(selectedIndex < 0) return;
+      const tc = testPlan.testCases[selectedIndex];
+      tc.parameters.push({ name: "NewParam", type: "VARCHAR", value: "" });
+      renderFullscreenParams(tc.parameters);
+    });
+
+    // ESC key to close fullscreen
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape"){
+        if(fullscreenSqlModal.classList.contains("active")){
+          closeFullscreenQuery();
+        } else if(fullscreenParamsModal.classList.contains("active")){
+          closeFullscreenParams();
+        }
+      }
     });
 
     // SQL language is already loaded via CDN script tag above
