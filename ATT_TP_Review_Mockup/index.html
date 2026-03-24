@@ -20,10 +20,10 @@
 
   <style>
     /* -----------------------------
-       WTW-ish Theme Tokens
-       (Swap values to match your official brand sheet)
+       PowerApps Theme
     --------------------------------*/
     :root{
+      --powerapps-purple: #742774;  /* PowerApps signature purple */
       --wtw-purple: #6f2dbd;      /* primary accent */
       --wtw-purple-700:#5b239b;
       --wtw-ink: #1f1f1f;
@@ -35,17 +35,158 @@
       --wtw-danger: #b42318;
       --wtw-warning: #b54708;
       --radius: 14px;
+      --sidebar-width: 200px;
+    }
+
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body{
       background: var(--wtw-bg);
       color: var(--wtw-ink);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-family: "Segoe UI", sistema-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* PowerApps Header */
+    .powerapps-header{
+      background: var(--powerapps-purple);
+      color: white;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .powerapps-header-left{
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .powerapps-header-left .app-waffle{
+      width: 24px;
+      height: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 6px);
+      grid-template-rows: repeat(3, 6px);
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .powerapps-header-left .app-waffle span{
+      background: white;
+      border-radius: 1px;
+    }
+
+    .powerapps-header-brand{
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .powerapps-header-brand::after{
+      content: "";
+      width: 1px;
+      height: 24px;
+      background: rgba(255,255,255,0.3);
+    }
+
+    .powerapps-app-name{
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .powerapps-header-right{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* PowerApps Sidebar */
+    .powerapps-sidebar{
+      position: fixed;
+      top: 48px;
+      left: 0;
+      width: var(--sidebar-width);
+      height: calc(100vh - 48px);
+      background: #f3f2f1;
+      border-right: 1px solid #d1d1d1;
+      overflow-y: auto;
+      z-index: 900;
+      transition: transform 0.3s ease;
+    }
+
+    .powerapps-sidebar.collapsed{
+      transform: translateX(calc(-1 * var(--sidebar-width)));
+    }
+
+    .powerapps-sidebar-section{
+      padding: 0;
+      margin: 8px 0;
+    }
+
+    .powerapps-sidebar-header{
+      padding: 8px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #605e5c;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .powerapps-sidebar-item{
+      padding: 8px 16px 8px 32px;
+      font-size: 13px;
+      color: #323130;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .powerapps-sidebar-item:hover{
+      background: #edebe9;
+    }
+
+    .powerapps-sidebar-item.active{
+      background: #e1dfdd;
+      border-left-color: var(--powerapps-purple);
+      font-weight: 600;
+    }
+
+    /* Main Content Area */
+    .powerapps-main{
+      margin-top: 48px;
+      margin-left: var(--sidebar-width);
+      height: calc(100vh - 48px);
+      overflow: hidden;
+      transition: margin-left 0.3s ease;
+    }
+
+    .powerapps-main.sidebar-collapsed{
+      margin-left: 0;
     }
 
     .wtw-navbar{
       background: var(--wtw-surface);
       border-bottom: 1px solid var(--wtw-border);
+      display: none; /* Hide old navbar */
     }
 
     .brand-dot{
@@ -86,9 +227,11 @@
 
     /* Layout */
     .app-shell{
-      max-width: 1400px;
-      margin: 18px auto;
-      padding: 0 14px;
+      max-width: 100%;
+      margin: 0;
+      padding: 18px 14px;
+      height: 100%;
+      overflow-y: auto;
     }
 
     /* Fixed header for review screen */
@@ -431,41 +574,66 @@
 </head>
 
 <body>
-  <!-- Top Navbar -->
-  <nav class="navbar wtw-navbar">
-    <div class="container-fluid px-3">
-      <div class="d-flex align-items-center gap-2">
-        <span class="fw-bold" style="color:var(--wtw-purple);">Willis Towers Watson</span>
-        <span class="brand-dot"></span>
-        <span class="fw-semibold">Test Plan Review</span>
+  <!-- PowerApps Header -->
+  <header class="powerapps-header">
+    <div class="powerapps-header-left">
+      <div class="app-waffle" id="sidebarToggle">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
       </div>
-
-      <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-sm btn-light border" title="Notifications">
-          <i class="bi bi-bell"></i>
-        </button>
-        <button class="btn btn-sm btn-light border" title="Settings">
-          <i class="bi bi-gear"></i>
-        </button>
-        <div class="vr mx-1"></div>
-        <button class="btn btn-sm btn-light border" title="User">
-          <i class="bi bi-person-circle"></i>
-        </button>
+      <div class="powerapps-header-brand">
+        Power Apps
+      </div>
+      <div class="powerapps-app-name">
+        Automated Testing Tool
       </div>
     </div>
-  </nav>
+    <div class="powerapps-header-right">
+      SANDBOX
+    </div>
+  </header>
 
-  <main class="app-shell" id="appRoot">
-    <!-- ----------------------------
-         SCREEN 1: Welcome Page
-    ----------------------------- -->
+  <!-- PowerApps Sidebar -->
+  <aside class="powerapps-sidebar" id="powerappsSidebar">
+    <div class="powerapps-sidebar-section">
+      <div class="powerapps-sidebar-header">Test Plan Management</div>
+      <div class="powerapps-sidebar-item active">Test Plans</div>
+    </div>
+    
+    <div class="powerapps-sidebar-section">
+      <div class="powerapps-sidebar-header">Test Case Management</div>
+      <div class="powerapps-sidebar-item">Test Cases</div>
+      <div class="powerapps-sidebar-item">Create SQL Testcase</div>
+      <div class="powerapps-sidebar-item">Create Action Testcases</div>
+    </div>
+    
+    <div class="powerapps-sidebar-section">
+      <div class="powerapps-sidebar-header">Test Case Execution</div>
+      <div class="powerapps-sidebar-item">Test Plan Executions</div>
+    </div>
+    
+    <div class="powerapps-sidebar-section">
+      <div class="powerapps-sidebar-header">Miscellaneous</div>
+      <div class="powerapps-sidebar-item">Announcements</div>
+      <div class="powerapps-sidebar-item">Submit Feedback</div>
+      <div class="powerapps-sidebar-item">Clear Cache</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="powerapps-main" id="powerappsMain">
+    <main class="app-shell" id="appRoot">
+      <!-- ----------------------------
+           SCREEN 1: Welcome Page
+      ----------------------------- -->
     <section id="screenWelcome">
       <div class="row g-3 align-items-stretch">
         <div class="col-12 col-lg-8">
           <div class="card p-4 h-100">
             <div class="d-flex align-items-start justify-content-between gap-3">
               <div>
-                <div class="subtle small">Welcome</div>
+                <!-- <div class="subtle small">Welcome</div> -->
                 <h2 class="mb-2 section-title">Kat ATT Test Plan</h2>
                 <p class="subtle mb-0">
                   Review the test cases assigned to this test plan. Approve or reject each test case with a streamlined flow.
@@ -516,7 +684,8 @@
             <ul class="mt-3 mb-0 subtle">
               <li>Review test cases in a focused list.</li>
               <li>See query + parameters clearly in one place.</li>
-              <li>Approve/Reject moves you to the next test case automatically.</li>
+              <li>Maximize the SQL and Parameters view for better visibility.</li>
+              <li>Approve/Reject moves you to the next test case automatically.</li>              
             </ul>
 
             <hr class="my-4">
@@ -697,7 +866,7 @@
                     <div class="small" id="fieldReviewComment" style="white-space: pre-wrap;">—</div>
                   </div>
                 </div>
-                
+
               </div><!-- row -->
             </div><!-- card -->
           </section>
@@ -1421,7 +1590,18 @@ WHERE t.Flag = 1;`,
       }
     });
 
+    // PowerApps Sidebar Toggle
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    const powerappsSidebar = document.getElementById("powerappsSidebar");
+    const powerappsMain = document.getElementById("powerappsMain");
+
+    sidebarToggle.addEventListener("click", () => {
+      powerappsSidebar.classList.toggle("collapsed");
+      powerappsMain.classList.toggle("sidebar-collapsed");
+    });
+
     // SQL language is already loaded via CDN script tag above
   </script>
+  </div><!-- /powerapps-main -->
 </body>
 </html>
