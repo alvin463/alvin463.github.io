@@ -666,6 +666,40 @@
         border-color: var(--powerapps-purple) !important;
       }
 
+      /* Tooltip styling */
+      .param-name-cell {
+        position: relative;
+      }
+
+      .param-name-cell:hover {
+        cursor: help;
+      }
+
+      .param-name-cell .info-icon {
+        color: var(--wtw-muted);
+        font-size: 0.85em;
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+      }
+
+      .param-name-cell input {
+        padding-right: 28px;
+      }
+
+      .tooltip {
+        max-width: 400px;
+      }
+
+      .tooltip-inner {
+        text-align: left;
+        padding: 8px 12px;
+        max-width: 400px;
+        font-size: 13px;
+      }
+
       /* Responsive: stack on narrow */
       @media (max-width: 992px) {
         .review-grid {
@@ -912,7 +946,7 @@
                       <input
                         class="form-control border"
                         id="tcSearch"
-                        placeholder="Search test cases..."
+                        placeholder="Search test cases..."                        
                       />
                     </div>
                     <button
@@ -987,7 +1021,7 @@
                       data-sort="name"
                       id="sortByName"
                     >
-                      <i class="bi bi-sort-alpha-down me-1"></i>Name
+                      <i class="bi bi-sort-alpha-down me-1"></i>Testcase Name
                     </button>
                   </div>
 
@@ -1336,9 +1370,9 @@ WHERE m.InYear = '2021'
   AND m.StatusCode IN ('L','U')
   AND m.Class IN ('RN','OPT');`,
               parameters: [
-                { name: "InYear", type: "VARCHAR", value: "2021" },
-                { name: "StatusCode", type: "VARCHAR", value: "L,U" },
-                { name: "Class", type: "VARCHAR", value: "RN,OPT" },
+                { name: "InYear", type: "VARCHAR", value: "2021", description: "The <strong>plan year</strong> for which to retrieve member data. This filters records based on the year of enrollment. Must be in <code>YYYY</code> format." },
+                { name: "StatusCode", type: "VARCHAR", value: "L,U", description: "Comma-separated list of valid member status codes. <em>L</em> represents active members, while <em>U</em> represents pending status members awaiting verification." },
+                { name: "Class", type: "VARCHAR", value: "RN,OPT", description: "Member classification codes that determine the type of membership. RN indicates regular members, and OPT indicates optional coverage members." },
               ],
               reviewComment: "",
             },
@@ -1353,7 +1387,7 @@ WHERE m.InYear = '2021'
 FROM dbo.Claims c
 WHERE c.PlanYear = @PlanYear
 ORDER BY c.LastUpdated DESC;`,
-              parameters: [{ name: "PlanYear", type: "INT", value: "2024" }],
+              parameters: [{ name: "PlanYear", type: "INT", value: "2024", description: "The fiscal year for which claims data should be retrieved. This parameter is used to filter all claim records to ensure only data from the specified year is included in the result set." }],
               reviewComment: "",
             },
             {
@@ -1367,7 +1401,7 @@ ORDER BY c.LastUpdated DESC;`,
 FROM dbo.Employees e
 WHERE e.GroupId = @GroupId
   AND e.IsActive = 1;`,
-              parameters: [{ name: "GroupId", type: "SMALLINT", value: "-1" }],
+              parameters: [{ name: "GroupId", type: "SMALLINT", value: "-1", description: "The unique identifier for the employee group. Use <code>-1</code> to select all groups, or provide a specific group ID to filter results to that group only." }],
               reviewComment: "",
             },
             // add more to match desired volume (mock)
@@ -1380,7 +1414,7 @@ WHERE e.GroupId = @GroupId
               query: `SELECT *
 FROM dbo.Table${i + 1} t
 WHERE t.Flag = 1;`,
-              parameters: [{ name: "Flag", type: "BIT", value: "1" }],
+              parameters: [{ name: "Flag", type: "BIT", value: "1", description: "Boolean flag indicating whether to include active records only. Set to <code>1</code> for true or <code>0</code> for false." }],
               reviewComment: "",
             })),
           ],
@@ -1674,10 +1708,14 @@ WHERE t.Flag = 1;`,
           paramTbody.innerHTML = "";
           params.forEach((p, i) => {
             const tr = document.createElement("tr");
+            const description = p.description || "No description available";
             tr.innerHTML = `
-          <td><input class="form-control form-control-sm" value="${escapeAttr(p.name)}"></td>
-          <td><input class="form-control form-control-sm" value="${escapeAttr(p.type)}"></td>
-          <td><input class="form-control form-control-sm" value="${escapeAttr(p.value)}"></td>
+          <td class="param-name-cell" title="" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="${escapeAttr(description)}">
+            <input class="form-control form-control-sm" value="${escapeAttr(p.name)}" readonly>
+            <i class="bi bi-info-circle info-icon"></i>
+          </td>
+          <td><input class="form-control form-control-sm" value="${escapeAttr(p.type)}" readonly></td>
+          <td><input class="form-control form-control-sm" value="${escapeAttr(p.value)}" readonly></td>
         `;
             // Keep the mock interactive (edit in place)
             const inputs = tr.querySelectorAll("input");
@@ -1695,6 +1733,10 @@ WHERE t.Flag = 1;`,
             );
 
             paramTbody.appendChild(tr);
+            
+            // Initialize Bootstrap tooltip for this row
+            const nameCell = tr.querySelector(".param-name-cell");
+            new bootstrap.Tooltip(nameCell);
           });
         }
 
@@ -1791,8 +1833,12 @@ WHERE t.Flag = 1;`,
 
           params.forEach((p, i) => {
             const tr = document.createElement("tr");
+            const description = p.description || "No description available";
             tr.innerHTML = `
-          <td><input class="form-control" value="${escapeAttr(p.name)}"></td>
+          <td class="param-name-cell" title="" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="${escapeAttr(description)}">
+            <input class="form-control" value="${escapeAttr(p.name)}">
+            <i class="bi bi-info-circle info-icon"></i>
+          </td>
           <td><input class="form-control" value="${escapeAttr(p.type)}"></td>
           <td><input class="form-control" value="${escapeAttr(p.value)}"></td>
           <td class="text-center">
@@ -1824,6 +1870,10 @@ WHERE t.Flag = 1;`,
             });
 
             fullscreenParamTbody.appendChild(tr);
+            
+            // Initialize Bootstrap tooltip for this row
+            const nameCell = tr.querySelector(".param-name-cell");
+            new bootstrap.Tooltip(nameCell);
           });
         }
 
@@ -2092,7 +2142,7 @@ WHERE t.Flag = 1;`,
         btnAddParam.addEventListener("click", () => {
           if (selectedIndex < 0) return;
           const tc = testPlan.testCases[selectedIndex];
-          tc.parameters.push({ name: "NewParam", type: "VARCHAR", value: "" });
+          tc.parameters.push({ name: "NewParam", type: "VARCHAR", value: "", description: "Description for new parameter" });
           renderParams(tc.parameters);
         });
 
@@ -2120,7 +2170,7 @@ WHERE t.Flag = 1;`,
         btnAddParamFullscreen.addEventListener("click", () => {
           if (selectedIndex < 0) return;
           const tc = testPlan.testCases[selectedIndex];
-          tc.parameters.push({ name: "NewParam", type: "VARCHAR", value: "" });
+          tc.parameters.push({ name: "NewParam", type: "VARCHAR", value: "", description: "Description for new parameter" });
           renderFullscreenParams(tc.parameters);
         });
 
