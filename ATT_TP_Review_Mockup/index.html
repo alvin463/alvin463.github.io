@@ -687,6 +687,70 @@
         transform: translateY(-1px);
       }
 
+      /* Toggle Switch for SQL Display */
+      .sql-toggle-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.875rem;
+      }
+
+      .sql-toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+      }
+
+      .sql-toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .sql-toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.3s;
+        border-radius: 24px;
+      }
+
+      .sql-toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+      }
+
+      input:checked + .sql-toggle-slider {
+        background-color: var(--wtw-purple);
+      }
+
+      input:checked + .sql-toggle-slider:before {
+        transform: translateX(20px);
+      }
+
+      .sql-toggle-label {
+        font-weight: 500;
+        color: var(--wtw-muted);
+        user-select: none;
+      }
+
+      .sql-toggle-label.active {
+        color: var(--wtw-purple);
+        font-weight: 600;
+      }
+
       /* Filter and Sort Button Active States */
       .filter-btn.active {
         background: var(--powerapps-purple) !important;
@@ -1261,9 +1325,17 @@
                       <div
                         class="d-flex align-items-center justify-content-between"
                       >
-                        <label class="form-label mb-2"
-                          >WHERE Clause (Criteria):
-                        </label>
+                        <div class="d-flex align-items-center gap-3">
+                          <label class="form-label mb-0">Criteria:</label>
+                          <div class="sql-toggle-wrapper">
+                            <span class="sql-toggle-label active" id="labelWhereClause">WHERE Clause</span>
+                            <label class="sql-toggle-switch">
+                              <input type="checkbox" id="sqlDisplayToggle">
+                              <span class="sql-toggle-slider"></span>
+                            </label>
+                            <span class="sql-toggle-label" id="labelFullSQL">Full SQL</span>
+                          </div>
+                        </div>
                         <div class="d-flex align-items-center gap-2">
                           <button
                             class="btn btn-sm btn-light border"
@@ -1285,7 +1357,7 @@
                       </div>
 
                       <!-- WHERE clause display -->
-                      <div class="code-editor">
+                      <div class="code-editor mt-2">
                         <pre
                           id="queryPre"
                         ><code id="queryCode" class="language-sql"></code></pre>
@@ -1674,6 +1746,7 @@ WHERE t.Flag = 1;`,
         let currentSort = "template"; // "template" or "name"
         let searchText = "";
         let pendingReviewAction = null; // "APPROVED" or "REJECTED"
+        let showFullSQL = false; // Toggle state for SQL display
 
         // -----------------------------
         // Elements
@@ -1700,6 +1773,9 @@ WHERE t.Flag = 1;`,
         const btnAddParam = document.getElementById("btnAddParam");
         const btnEditTestCase = document.getElementById("btnEditTestCase");
         const btnCopyFullSQL = document.getElementById("btnCopyFullSQL");
+        const sqlDisplayToggle = document.getElementById("sqlDisplayToggle");
+        const labelWhereClause = document.getElementById("labelWhereClause");
+        const labelFullSQL = document.getElementById("labelFullSQL");
 
         const tcNameHeading = document.getElementById("tcNameHeading");
         const tcMetaLine = document.getElementById("tcMetaLine");
@@ -1989,11 +2065,12 @@ WHERE t.Flag = 1;`,
             reviewCommentSection.style.display = "none";
           }
 
-          // Query editor - extract WHERE clause if possible
+          // Query editor - display based on toggle state
           const whereClause = extractWhereClause(tc.query);
-          queryTextArea.value = whereClause;
-          // Store full query for copy button
+          queryTextArea.value = showFullSQL ? tc.query : whereClause;
+          // Store full query for copy button and toggle
           queryTextArea.dataset.fullQuery = tc.query;
+          queryTextArea.dataset.whereClause = whereClause;
           syncAndHighlightQuery();
 
           // Parameters
@@ -2386,6 +2463,28 @@ WHERE t.Flag = 1;`,
         // Toggle Sort Controls
         btnToggleSort.addEventListener("click", () => {
           sortControls.classList.toggle("d-none");
+        });
+
+        // Toggle SQL Display
+        sqlDisplayToggle.addEventListener("change", (e) => {
+          showFullSQL = e.target.checked;
+          
+          // Update label styles
+          if (showFullSQL) {
+            labelWhereClause.classList.remove("active");
+            labelFullSQL.classList.add("active");
+          } else {
+            labelWhereClause.classList.add("active");
+            labelFullSQL.classList.remove("active");
+          }
+          
+          // Update display if a test case is selected
+          if (selectedIndex >= 0) {
+            const fullQuery = queryTextArea.dataset.fullQuery || "";
+            const whereClause = queryTextArea.dataset.whereClause || "";
+            queryTextArea.value = showFullSQL ? fullQuery : whereClause;
+            syncAndHighlightQuery();
+          }
         });
 
         // Query editor sync
