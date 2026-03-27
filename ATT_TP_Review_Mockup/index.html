@@ -456,12 +456,11 @@
         background-clip: padding-box;
       }
 
-
-      .language-sql{
+      .language-sql {
         padding: 0 !important;
         margin: 0 !important;
       }
-      
+
       /* Form field emphasis */
       .form-label {
         font-weight: 600;
@@ -529,7 +528,7 @@
         font-size: 16px;
         line-height: 1.6;
         background: transparent !important;
-      }  
+      }
       .fullscreen-code-editor pre code {
         background-color: transparent !important;
       }
@@ -623,9 +622,9 @@
         color: white;
         border: none;
         border-radius: var(--radius);
-        padding: 20px 24px;
+        padding: 24px 28px;
         margin-bottom: 16px;
-        box-shadow: 0 4px 12px rgba(20, 128, 74, 0.3);
+        box-shadow: 0 4px 16px rgba(20, 128, 74, 0.25);
       }
 
       .completion-banner.show {
@@ -647,10 +646,45 @@
       .completion-banner h4 {
         font-weight: 600;
         color: white;
+        font-size: 1.25rem;
       }
 
       .completion-banner p {
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 0.95rem;
+      }
+
+      .completion-banner .btn {
+        font-weight: 600;
+        min-width: 140px;
+        border: 2px solid transparent;
+      }
+
+      .completion-banner .btn-success {
+        background-color: white;
+        color: #14804a;
+        border-color: white;
+      }
+
+      .completion-banner .btn-success:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #14804a;
+        border-color: rgba(255, 255, 255, 0.9);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .completion-banner .btn-danger {
+        background-color: rgba(180, 35, 24, 0.2);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .completion-banner .btn-danger:hover {
+        background-color: rgba(180, 35, 24, 0.3);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
       }
 
       /* Filter and Sort Button Active States */
@@ -771,36 +805,64 @@
                 >
                   <div>
                     <!-- <div class="subtle small">Welcome</div> -->
-                    <h2 class="mb-2 section-title">Kat ATT Test Plan</h2>
+                    <h4 class="mb-1 section-title">Test Plan Review</h4>                   
                     <p class="subtle mb-0">
                       Review the test cases assigned to this test plan. Approve
                       or reject each test case with a streamlined flow.
                     </p>
                   </div>
-                  <span class="badge badge-soft px-3 py-2">Review Session</span>
+                  <!-- <span class="badge badge-soft px-3 py-2">Review Session</span> -->
                 </div>
 
-                <hr class="my-4" />
+                <hr class="my-3" />
 
                 <div class="row g-3">
-                  <div class="col-12 col-md-6">
+                  <div class="col-12 col-md-12">
+                    <div class="subtle small">Test Plan Name</div>
+                    <div class="fw-semibold" id="testPlanName">Performance Testing test plan </div>
+                  </div>
+                  <div class="col-6 col-md-3">
                     <div class="subtle small">Owner</div>
                     <div class="fw-semibold" id="welcomeOwner">Kat</div>
                   </div>
-                  <div class="col-12 col-md-6">
-                    <div class="subtle small">Assigned Reviewers</div>
-                    <div class="fw-semibold" id="welcomeReviewers">
-                      Alex Tonog, Jorge De Los Reyes, Alvin Manzano
-                    </div>
-                  </div>
-                  <div class="col-12 col-md-6">
+                  <div class="col-6 col-md-3">
                     <div class="subtle small"># of Test Cases</div>
                     <div class="fw-semibold" id="welcomeCount">8</div>
                   </div>
-                  <div class="col-12 col-md-6">
+                  <div class="col-6 col-md-3">
+                    <div class="subtle small">Client</div>
+                    <div class="fw-semibold" id="welcomeClient">—</div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="subtle small">Focus</div>
+                    <div class="fw-semibold" id="welcomeFocus">—</div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="subtle small">Type</div>
+                    <div class="fw-semibold" id="welcomeType">—</div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="subtle small">SOC 2</div>
+                    <div class="fw-semibold" id="welcomeSoc2">—</div>
+                  </div>
+                  <div class="col-6 col-md-3">
                     <div class="subtle small">Date Last Updated</div>
                     <div class="fw-semibold" id="welcomeUpdated">
-                      2026-03-23 20:45
+                      2026-03-23
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="subtle small">
+                      Pending / Approved / Rejected
+                    </div>
+                    <div class="fw-semibold" id="welcomeStatusSummary">
+                      — / — / —
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="subtle small">Assigned Reviewers</div>
+                    <div class="fw-semibold" id="welcomeReviewers">
+                      Alex Tonog, Jorge De Los Reyes, Alvin Manzano
                     </div>
                   </div>
                 </div>
@@ -830,30 +892,57 @@
                     style="color: var(--wtw-purple); font-size: 1.25rem"
                   ></i>
                 </div>
-                <ul class="mt-3 mb-0 subtle">
+                <ul class="mt-3 mb-0 subtle small">
                   <li>Review test cases in a focused list.</li>
                   <li>See Criteria + Parameters clearly in one place.</li>
                   <li>
-                    Maximize the Criteria and Setup Parameters view for better visibility.
+                    Maximize the Criteria and Setup Parameters view for better
+                    visibility.
                   </li>
                   <li>
                     Approve/Reject moves you to the next test case
                     automatically.
                   </li>
+                  <li>Comments are required only for rejected test cases.</li>
                 </ul>
+
+                <div class="mt-3">
+                  <div class="small subtle mb-2">Test Cases in this Plan:</div>
+                  <div
+                    class="small"
+                    style="max-height: 120px; overflow-y: auto"
+                    id="testCaseNamesList"
+                  >
+                    <div class="text-muted">Loading...</div>
+                  </div>
+                </div>
 
                 <hr class="my-4" />
 
-                <div class="small subtle">Tip</div>
+                <div class="small subtle">Tips:</div>
                 <div class="fw-semibold">
-                  Use the burger button
-                  <button
-                    class="btn btn-sm btn-light border"
-                    title="Toggle test case list"
-                  >
-                    <i class="bi bi-list"></i>
-                  </button>
-                  to collapse the test case list and focus on details.
+                  <ul>
+                    <li>
+                      Use the burger button
+                      <button
+                        class="btn btn-sm btn-light border"
+                        title="Toggle test case list"
+                      >
+                        <i class="bi bi-list"></i>
+                      </button>
+                      to collapse the test case list and focus on details.
+                    </li>
+                    <li>
+                      Use the Maximize  button
+                      <button
+                        class="btn btn-sm btn-light border"
+                        title="Maximize test case list"
+                      >
+                        <i class="bi bi-arrows-fullscreen"></i>
+                      </button>
+                      to maximize and view the panes in full screen mode.
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -866,20 +955,30 @@
         <section id="screenReview" class="d-none">
           <!-- Completion Banner -->
           <div class="completion-banner alert" id="completionBanner">
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <h4 class="mb-1">
+            <div
+              class="d-flex align-items-center justify-content-between gap-3"
+            >
+              <div class="flex-grow-1">
+                <h4 class="mb-2">
                   <i class="bi bi-check-circle-fill me-2"></i>Test Plan Review
                   Complete!
                 </h4>
                 <p class="mb-0">
-                  All test cases have been reviewed. You can now approve the
-                  entire test plan.
+                  All test cases have been reviewed. You can now approve or
+                  reject the entire test plan.
                 </p>
               </div>
-              <button class="btn btn-light btn-lg" id="btnApproveTestPlan">
-                <i class="bi bi-check2-all me-2"></i>Approve Test Plan
-              </button>
+              <div class="d-flex gap-2 flex-shrink-0">
+                <button
+                  class="btn btn-danger visually-hidden"
+                  id="btnRejectTestPlanBanner"
+                >
+                  <i class="bi bi-x-circle me-1"></i>Reject Plan
+                </button>
+                <button class="btn btn-success" id="btnApproveTestPlanBanner">
+                  <i class="bi bi-check2-all me-1"></i>Approve Test Plan
+                </button>
+              </div>
             </div>
           </div>
 
@@ -898,7 +997,7 @@
                     <i class="bi bi-list"></i>
                   </button>
                   <div>
-                    <div class="subtle small">Test Plan</div>
+                    <div class="subtle small">Test Plan Review</div>
                     <div class="fw-bold" id="planTitleTop">
                       Kat ATT Test Plan
                     </div>
@@ -909,6 +1008,13 @@
                   <span class="badge badge-soft px-3 py-2" id="progressBadge"
                     >0 / 8 reviewed</span
                   >
+                  <button
+                    class="btn btn-sm btn-danger border"
+                    id="btnRejectTestPlan"
+                    title="Reject Test Plan"
+                  >
+                    <i class="bi bi-x-circle"></i> Reject Test Plan
+                  </button>
                   <button
                     class="btn btn-sm btn-light border"
                     id="btnBackToWelcome"
@@ -946,7 +1052,7 @@
                       <input
                         class="form-control border"
                         id="tcSearch"
-                        placeholder="Search test cases..."                        
+                        placeholder="Search test cases..."
                       />
                     </div>
                     <button
@@ -1007,7 +1113,10 @@
                   </div>
 
                   <!-- Sort Controls -->
-                  <div class="mt-3 d-flex align-items-center gap-2 d-none" id="sortControls">
+                  <div
+                    class="mt-3 d-flex align-items-center gap-2 d-none"
+                    id="sortControls"
+                  >
                     <span class="small text-muted">Sort by:</span>
                     <button
                       class="btn btn-sm btn-outline-secondary sort-btn active"
@@ -1043,6 +1152,13 @@
                       </div>
                     </div>
                     <div class="d-flex gap-2">
+                      <button
+                        class="btn btn-light btn-sm border"
+                        id="btnEditTestCase"
+                        disabled
+                      >
+                        <i class="bi bi-pencil me-1"></i> Edit
+                      </button>
                       <button
                         class="btn btn-success btn-sm"
                         id="btnApprove"
@@ -1145,9 +1261,18 @@
                       <div
                         class="d-flex align-items-center justify-content-between"
                       >
-                        <label class="form-label mb-2">Criteria: </label>
+                        <label class="form-label mb-2"
+                          >WHERE Clause (Criteria):
+                        </label>
                         <div class="d-flex align-items-center gap-2">
-                          <div class="small subtle">&nbsp;</div>
+                          <button
+                            class="btn btn-sm btn-light border"
+                            id="btnCopyFullSQL"
+                            title="Copy full SQL query"
+                            disabled
+                          >
+                            <i class="bi bi-clipboard me-1"></i> Copy Full SQL
+                          </button>
                           <button
                             class="btn btn-sm btn-light border"
                             id="btnMaximizeQuery"
@@ -1159,7 +1284,7 @@
                         </div>
                       </div>
 
-                      <!-- Highlighted textarea-like editor -->
+                      <!-- WHERE clause display -->
                       <div class="code-editor">
                         <pre
                           id="queryPre"
@@ -1264,12 +1389,82 @@
           </div>
         </div>
 
+        <!-- Reject Test Plan Modal -->
+        <div
+          class="modal fade"
+          id="rejectTestPlanModal"
+          tabindex="-1"
+          aria-labelledby="rejectTestPlanModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="rejectTestPlanModalLabel">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>Reject
+                  Test Plan
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label for="rejectTestPlanReason" class="form-label"
+                    >Reason <span class="text-danger">*required</span></label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="rejectTestPlanReason"
+                    rows="4"
+                    placeholder="Please explain why you are rejecting this test plan..."
+                  ></textarea>
+                  <div class="form-text">
+                    This reason will be recorded with your rejection decision.
+                  </div>
+                </div>
+                <div
+                  class="alert alert-warning mb-0 d-flex align-items-start gap-2"
+                >
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                  <div>
+                    <strong>Warning:</strong> This will reject the entire test
+                    plan:
+                    <div class="small mt-1 fw-semibold" id="rejectTestPlanName">
+                      —
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-light"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  id="btnConfirmRejectTestPlan"
+                >
+                  <i class="bi bi-x-circle me-1"></i>Reject Test Plan
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Fullscreen SQL Query Modal -->
         <div class="fullscreen-modal" id="fullscreenSqlModal">
           <div class="fullscreen-modal-header">
             <div>
               <h4 class="mb-1">
-                SQL Query - <span id="fullscreenTestCaseName">—</span>
+                Full SQL Query - <span id="fullscreenTestCaseName">—</span>
               </h4>
               <div class="small text-muted">Full screen view</div>
             </div>
@@ -1301,7 +1496,8 @@
           <div class="fullscreen-modal-header">
             <div>
               <h4 class="mb-1">
-                Setup Parameters | <span id="fullscreenParamsTestCaseName">|</span>
+                Setup Parameters |
+                <span id="fullscreenParamsTestCaseName">|</span>
               </h4>
               <div class="small text-muted">Full screen view</div>
             </div>
@@ -1352,15 +1548,20 @@
         // Mock data (replace with real)
         // -----------------------------
         const testPlan = {
-          name: "Kat ATT Test Plan",
-          owner: "Kat",
+          name: "Performance Testing test plan",
+          owner: "Zara Diwa",
+          client: "Automated Testing Tool (H-BC4)",
+          focus: "Calc",
+          type: "Annual Enrollment",
+          soc2: "Yes",
           reviewers: ["Alex Tonog", "Jorge De Los Reyes", "Alvin Manzano"],
-          lastUpdated: "2026-03-23 20:45",
+          lastUpdated: "2026-03-23",
           testCases: [
             {
               name: "Group42 - Active Full-Time Resident",
               id: "TC-1467",
-              template: "Basic Test",
+              type: "SQL",
+              template: "Group Id",
               status: "PENDING",
               description:
                 "Validate eligibility rules for active full-time residents.",
@@ -1370,16 +1571,35 @@ WHERE m.InYear = '2021'
   AND m.StatusCode IN ('L','U')
   AND m.Class IN ('RN','OPT');`,
               parameters: [
-                { name: "InYear", type: "VARCHAR", value: "2021", description: "The <strong>plan year</strong> for which to retrieve member data. This filters records based on the year of enrollment. Must be in <code>YYYY</code> format." },
-                { name: "StatusCode", type: "VARCHAR", value: "L,U", description: "Comma-separated list of valid member status codes. <em>L</em> represents active members, while <em>U</em> represents pending status members awaiting verification." },
-                { name: "Class", type: "VARCHAR", value: "RN,OPT", description: "Member classification codes that determine the type of membership. RN indicates regular members, and OPT indicates optional coverage members." },
+                {
+                  name: "InYear",
+                  type: "VARCHAR",
+                  value: "2021",
+                  description:
+                    "The <strong>plan year</strong> for which to retrieve member data. This filters records based on the year of enrollment. Must be in <code>YYYY</code> format.",
+                },
+                {
+                  name: "StatusCode",
+                  type: "VARCHAR",
+                  value: "L,U",
+                  description:
+                    "Comma-separated list of valid member status codes. <em>L</em> represents active members, while <em>U</em> represents pending status members awaiting verification.",
+                },
+                {
+                  name: "Class",
+                  type: "VARCHAR",
+                  value: "RN,OPT",
+                  description:
+                    "Member classification codes that determine the type of membership. RN indicates regular members, and OPT indicates optional coverage members.",
+                },
               ],
               reviewComment: "",
             },
             {
               name: "Kat Test Case",
               id: "TC-1468",
-              template: "Basic Test",
+              type: "SQL",
+              template: "Group Id",
               status: "PENDING",
               description:
                 "Verify default case behavior when optional filters are absent.",
@@ -1387,13 +1607,22 @@ WHERE m.InYear = '2021'
 FROM dbo.Claims c
 WHERE c.PlanYear = @PlanYear
 ORDER BY c.LastUpdated DESC;`,
-              parameters: [{ name: "PlanYear", type: "INT", value: "2024", description: "The fiscal year for which claims data should be retrieved. This parameter is used to filter all claim records to ensure only data from the specified year is included in the result set." }],
+              parameters: [
+                {
+                  name: "PlanYear",
+                  type: "INT",
+                  value: "2024",
+                  description:
+                    "The fiscal year for which claims data should be retrieved. This parameter is used to filter all claim records to ensure only data from the specified year is included in the result set.",
+                },
+              ],
               reviewComment: "",
             },
             {
               name: "Group43 - Active Part Time A",
               id: "TC-1469",
-              template: "Action Based",
+              type: "SQL",
+              template: "Group Id",
               status: "PENDING",
               description:
                 "Validate part-time segment A business rules and exclusions.",
@@ -1401,20 +1630,37 @@ ORDER BY c.LastUpdated DESC;`,
 FROM dbo.Employees e
 WHERE e.GroupId = @GroupId
   AND e.IsActive = 1;`,
-              parameters: [{ name: "GroupId", type: "SMALLINT", value: "-1", description: "The unique identifier for the employee group. Use <code>-1</code> to select all groups, or provide a specific group ID to filter results to that group only." }],
+              parameters: [
+                {
+                  name: "GroupId",
+                  type: "SMALLINT",
+                  value: "-1",
+                  description:
+                    "The unique identifier for the employee group. Use <code>-1</code> to select all groups, or provide a specific group ID to filter results to that group only.",
+                },
+              ],
               reviewComment: "",
             },
             // add more to match desired volume (mock)
-            ...Array.from({ length: 5 }).map((_, i) => ({
+            ...Array.from({ length: 3 }).map((_, i) => ({
               name: `Additional Test Case ${i + 1}`,
               id: `TC-147${i}`,
+              type: i % 2 ? "SQL" : "Action",
               template: i % 2 ? "Basic Test" : "Action Based",
               status: "PENDING",
               description: "Mock description for additional test cases.",
               query: `SELECT *
 FROM dbo.Table${i + 1} t
 WHERE t.Flag = 1;`,
-              parameters: [{ name: "Flag", type: "BIT", value: "1", description: "Boolean flag indicating whether to include active records only. Set to <code>1</code> for true or <code>0</code> for false." }],
+              parameters: [
+                {
+                  name: "Flag",
+                  type: "BIT",
+                  value: "1",
+                  description:
+                    "Boolean flag indicating whether to include active records only. Set to <code>1</code> for true or <code>0</code> for false.",
+                },
+              ],
               reviewComment: "",
             })),
           ],
@@ -1424,7 +1670,7 @@ WHERE t.Flag = 1;`,
         // State
         // -----------------------------
         let selectedIndex = -1;
-        let currentFilter = "ALL";
+        let currentFilter = "PENDING"; // Start with PENDING filter
         let currentSort = "template"; // "template" or "name"
         let searchText = "";
         let pendingReviewAction = null; // "APPROVED" or "REJECTED"
@@ -1452,6 +1698,8 @@ WHERE t.Flag = 1;`,
         const btnApprove = document.getElementById("btnApprove");
         const btnReject = document.getElementById("btnReject");
         const btnAddParam = document.getElementById("btnAddParam");
+        const btnEditTestCase = document.getElementById("btnEditTestCase");
+        const btnCopyFullSQL = document.getElementById("btnCopyFullSQL");
 
         const tcNameHeading = document.getElementById("tcNameHeading");
         const tcMetaLine = document.getElementById("tcMetaLine");
@@ -1483,6 +1731,19 @@ WHERE t.Flag = 1;`,
         const btnConfirmReview = document.getElementById("btnConfirmReview");
         const reviewCommentLabel = document.querySelector(
           'label[for=\"reviewCommentText\"]',
+        );
+
+        // Reject Test Plan modal elements
+        const rejectTestPlanModal = new bootstrap.Modal(
+          document.getElementById("rejectTestPlanModal"),
+        );
+        const rejectTestPlanReason = document.getElementById(
+          "rejectTestPlanReason",
+        );
+        const rejectTestPlanName =
+          document.getElementById("rejectTestPlanName");
+        const btnConfirmRejectTestPlan = document.getElementById(
+          "btnConfirmRejectTestPlan",
         );
 
         // Fullscreen SQL modal elements
@@ -1523,13 +1784,43 @@ WHERE t.Flag = 1;`,
 
         // Welcome fields
         document.getElementById("welcomeOwner").textContent = testPlan.owner;
+        document.getElementById("welcomeClient").textContent =
+          testPlan.client || "—";
+        document.getElementById("welcomeFocus").textContent =
+          testPlan.focus || "—";
+        document.getElementById("welcomeType").textContent =
+          testPlan.type || "—";
+        document.getElementById("welcomeSoc2").textContent =
+          testPlan.soc2 || "—";
         document.getElementById("welcomeReviewers").textContent =
           testPlan.reviewers.join(", ");
         document.getElementById("welcomeCount").textContent =
           testPlan.testCases.length;
         document.getElementById("welcomeUpdated").textContent =
           testPlan.lastUpdated;
+        document.getElementById("welcomeStatusSummary").textContent =
+          `${pendingCount()} / ${approvedCount()} / ${rejectedCount()}`;
         document.getElementById("planTitleTop").textContent = testPlan.name;
+
+        // Display test case names list
+        const testCaseNamesList = document.getElementById("testCaseNamesList");
+        if (testCaseNamesList) {
+          testCaseNamesList.innerHTML = testPlan.testCases
+            .map(
+              (tc, i) =>
+                `<div class="text-truncate" title="${escapeAttr(tc.name)}">${i + 1}. ${escapeHtml(tc.name)}</div>`,
+            )
+            .join("");
+        }
+
+        // Update button text based on review progress
+        function updateStartReviewButton() {
+          const hasReviewed = reviewedCount() > 0;
+          btnStartReview.innerHTML = hasReviewed
+            ? '<i class="bi bi-arrow-right-circle me-1"></i>Continue Review'
+            : '<i class="bi bi-play-fill me-1"></i>Start Review';
+        }
+        updateStartReviewButton();
 
         // -----------------------------
         // Helpers
@@ -1617,7 +1908,9 @@ WHERE t.Flag = 1;`,
           if (currentSort === "template") {
             // Sort by template, then by name
             items.sort((a, b) => {
-              const templateCompare = a.tc.template.localeCompare(b.tc.template);
+              const templateCompare = a.tc.template.localeCompare(
+                b.tc.template,
+              );
               if (templateCompare !== 0) return templateCompare;
               return a.tc.name.localeCompare(b.tc.name);
             });
@@ -1653,7 +1946,7 @@ WHERE t.Flag = 1;`,
           <div class="d-flex justify-content-between align-items-start gap-2">
             <div>
               <div class="fw-semibold">${escapeHtml(tc.name)} ${commentIcon}</div>
-              <div class="small subtle">${escapeHtml(tc.id)} • ${escapeHtml(tc.template)}</div>
+              <div class="small subtle">${escapeHtml(tc.id)} • ${escapeHtml(tc.type ?? " - ")} • ${escapeHtml(tc.template)}</div>
             </div>
             <span class="badge ${statusBadgeClass(tc.status)}">${tc.status}</span>
           </div>
@@ -1674,6 +1967,8 @@ WHERE t.Flag = 1;`,
           btnAddParam.disabled = false;
           btnMaximizeQuery.disabled = false;
           btnMaximizeParams.disabled = false;
+          btnEditTestCase.disabled = false;
+          btnCopyFullSQL.disabled = false;
 
           // Header
           tcNameHeading.textContent = tc.name;
@@ -1694,8 +1989,11 @@ WHERE t.Flag = 1;`,
             reviewCommentSection.style.display = "none";
           }
 
-          // Query editor
-          queryTextArea.value = tc.query;
+          // Query editor - extract WHERE clause if possible
+          const whereClause = extractWhereClause(tc.query);
+          queryTextArea.value = whereClause;
+          // Store full query for copy button
+          queryTextArea.dataset.fullQuery = tc.query;
           syncAndHighlightQuery();
 
           // Parameters
@@ -1733,7 +2031,7 @@ WHERE t.Flag = 1;`,
             );
 
             paramTbody.appendChild(tr);
-            
+
             // Initialize Bootstrap tooltip for this row
             const nameCell = tr.querySelector(".param-name-cell");
             new bootstrap.Tooltip(nameCell);
@@ -1760,17 +2058,17 @@ WHERE t.Flag = 1;`,
           const lineHeightPx = 19.5; // 13px font-size * 1.5 line-height
           const verticalPadding = 24; // 12px top + 12px bottom
           const maxLines = 10;
-          
+
           if (lines <= maxLines) {
             // Fit content - set explicit height for lines <= 10
             const contentHeight = lines * lineHeightPx;
             // With box-sizing: border-box, total height = content + padding
-            queryPre.style.height = (contentHeight + verticalPadding) + "px";
+            queryPre.style.height = contentHeight + verticalPadding + "px";
             queryPre.style.overflow = "hidden";
           } else {
             // More than 10 lines - use max height and show scrollbar
             const maxContentHeight = maxLines * lineHeightPx;
-            queryPre.style.height = (maxContentHeight + verticalPadding) + "px";
+            queryPre.style.height = maxContentHeight + verticalPadding + "px";
             queryPre.style.overflow = "auto";
           }
         }
@@ -1791,6 +2089,7 @@ WHERE t.Flag = 1;`,
           const tc = testPlan.testCases[selectedIndex];
 
           fullscreenTestCaseName.textContent = `${tc.id} - ${tc.name}`;
+          // Show full query in fullscreen mode
           fullscreenQueryTextArea.value = tc.query;
           syncAndHighlightFullscreenQuery();
 
@@ -1870,7 +2169,7 @@ WHERE t.Flag = 1;`,
             });
 
             fullscreenParamTbody.appendChild(tr);
-            
+
             // Initialize Bootstrap tooltip for this row
             const nameCell = tr.querySelector(".param-name-cell");
             new bootstrap.Tooltip(nameCell);
@@ -1933,6 +2232,8 @@ WHERE t.Flag = 1;`,
           btnAddParam.disabled = true;
           btnMaximizeQuery.disabled = true;
           btnMaximizeParams.disabled = true;
+          btnEditTestCase.disabled = true;
+          btnCopyFullSQL.disabled = true;
 
           tcNameHeading.textContent = "—";
           tcMetaLine.textContent = "Select a test case from the list.";
@@ -1943,8 +2244,26 @@ WHERE t.Flag = 1;`,
           fieldDesc.value = "";
           reviewCommentSection.style.display = "none";
           queryTextArea.value = "";
+          queryTextArea.dataset.fullQuery = "";
           syncAndHighlightQuery();
           paramTbody.innerHTML = `<tr><td colspan="3" class="subtle">Select a test case to view parameters.</td></tr>`;
+        }
+
+        // Extract WHERE clause from SQL query
+        function extractWhereClause(query) {
+          if (!query) return "";
+
+          // Try to find WHERE clause in the query
+          const whereMatch = query.match(
+            /\bWHERE\b[\s\S]*?(?=\bORDER BY\b|\bGROUP BY\b|\bHAVING\b|\bLIMIT\b|;|$)/i,
+          );
+
+          if (whereMatch) {
+            return whereMatch[0].trim();
+          }
+
+          // If no WHERE clause found, return full query
+          return query;
         }
 
         function escapeHtml(str) {
@@ -1973,6 +2292,14 @@ WHERE t.Flag = 1;`,
 
           updateTopBadges();
           updateFilterCounts();
+
+          // Set PENDING filter as active by default
+          document
+            .querySelectorAll(".filter-btn")
+            .forEach((b) => b.classList.remove("active"));
+          const pendingBtn = document.querySelector('[data-filter="PENDING"]');
+          if (pendingBtn) pendingBtn.classList.add("active");
+
           renderList();
 
           // auto-select first visible item
@@ -1984,6 +2311,11 @@ WHERE t.Flag = 1;`,
         btnBackToWelcome.addEventListener("click", () => {
           screenReview.classList.add("d-none");
           screenWelcome.classList.remove("d-none");
+
+          // Update button text and status summary
+          updateStartReviewButton();
+          document.getElementById("welcomeStatusSummary").textContent =
+            `${pendingCount()} / ${approvedCount()} / ${rejectedCount()}`;
         });
 
         btnToggleSidebar.addEventListener("click", () => {
@@ -2142,8 +2474,47 @@ WHERE t.Flag = 1;`,
         btnAddParam.addEventListener("click", () => {
           if (selectedIndex < 0) return;
           const tc = testPlan.testCases[selectedIndex];
-          tc.parameters.push({ name: "NewParam", type: "VARCHAR", value: "", description: "Description for new parameter" });
+          tc.parameters.push({
+            name: "NewParam",
+            type: "VARCHAR",
+            value: "",
+            description: "Description for new parameter",
+          });
           renderParams(tc.parameters);
+        });
+
+        // Edit test case button
+        btnEditTestCase.addEventListener("click", () => {
+          if (selectedIndex < 0) return;
+          const tc = testPlan.testCases[selectedIndex];
+          alert(
+            `Mock: Opening test case "${tc.name}" (${tc.id}) in edit mode.\n\nThis would navigate to the test case editor flow.`,
+          );
+        });
+
+        // Copy full SQL button
+        btnCopyFullSQL.addEventListener("click", async () => {
+          if (selectedIndex < 0) return;
+          const fullQuery =
+            queryTextArea.dataset.fullQuery || queryTextArea.value;
+
+          try {
+            await navigator.clipboard.writeText(fullQuery);
+            // Show success feedback
+            const originalHTML = btnCopyFullSQL.innerHTML;
+            btnCopyFullSQL.innerHTML =
+              '<i class="bi bi-check-lg me-1"></i> Copied!';
+            btnCopyFullSQL.classList.add("btn-success");
+            btnCopyFullSQL.classList.remove("btn-light");
+
+            setTimeout(() => {
+              btnCopyFullSQL.innerHTML = originalHTML;
+              btnCopyFullSQL.classList.remove("btn-success");
+              btnCopyFullSQL.classList.add("btn-light");
+            }, 2000);
+          } catch (err) {
+            alert("Failed to copy SQL to clipboard. Please try again.");
+          }
         });
 
         // Fullscreen SQL Query
@@ -2170,7 +2541,12 @@ WHERE t.Flag = 1;`,
         btnAddParamFullscreen.addEventListener("click", () => {
           if (selectedIndex < 0) return;
           const tc = testPlan.testCases[selectedIndex];
-          tc.parameters.push({ name: "NewParam", type: "VARCHAR", value: "", description: "Description for new parameter" });
+          tc.parameters.push({
+            name: "NewParam",
+            type: "VARCHAR",
+            value: "",
+            description: "Description for new parameter",
+          });
           renderFullscreenParams(tc.parameters);
         });
 
@@ -2185,33 +2561,95 @@ WHERE t.Flag = 1;`,
           }
         });
 
-        // Approve Test Plan (when all test cases are reviewed)
+        // Approve/Reject Test Plan (when all test cases are reviewed)
         const btnApproveTestPlan =
           document.getElementById("btnApproveTestPlan");
-        if (btnApproveTestPlan) {
-          btnApproveTestPlan.addEventListener("click", () => {
-            const allApproved = testPlan.testCases.every(
-              (tc) => tc.status === "APPROVED",
+        const btnRejectTestPlan = document.getElementById("btnRejectTestPlan");
+        const btnApproveTestPlanBanner = document.getElementById(
+          "btnApproveTestPlanBanner",
+        );
+        const btnRejectTestPlanBanner = document.getElementById(
+          "btnRejectTestPlanBanner",
+        );
+
+        function handleApproveTestPlan() {
+          const allApproved = testPlan.testCases.every(
+            (tc) => tc.status === "APPROVED",
+          );
+          if (allApproved) {
+            alert(
+              `✅ Test Plan "${testPlan.name}" has been approved!\n\nAll ${testPlan.testCases.length} test cases have been approved.`,
             );
-            if (allApproved) {
+          } else {
+            const rejected = rejectedCount();
+            const approved = approvedCount();
+            if (
+              confirm(
+                `This test plan has ${rejected} rejected test case(s) and ${approved} approved test case(s).\n\nDo you want to approve the test plan anyway?`,
+              )
+            ) {
               alert(
-                `✅ Test Plan "${testPlan.name}" has been approved!\n\nAll ${testPlan.testCases.length} test cases have been approved.`,
+                `✅ Test Plan "${testPlan.name}" has been approved with ${rejected} rejected test case(s).`,
               );
-            } else {
-              const rejectedCount = rejectedCount();
-              const approvedCount = approvedCount();
-              if (
-                confirm(
-                  `This test plan has ${rejectedCount} rejected test case(s) and ${approvedCount} approved test case(s).\n\nDo you want to approve the test plan anyway?`,
-                )
-              ) {
-                alert(
-                  `✅ Test Plan "${testPlan.name}" has been approved with ${rejectedCount} rejected test case(s).`,
-                );
-              }
             }
-          });
+          }
         }
+
+        function handleRejectTestPlan() {
+          // Open the modal
+          rejectTestPlanName.textContent = testPlan.name;
+          rejectTestPlanReason.value = "";
+          rejectTestPlanModal.show();
+        }
+
+        // Confirm Reject Test Plan from Modal
+        btnConfirmRejectTestPlan.addEventListener("click", () => {
+          const reason = rejectTestPlanReason.value.trim();
+
+          if (!reason) {
+            alert("Please provide a reason for rejecting the test plan.");
+            rejectTestPlanReason.focus();
+            return;
+          }
+
+          // Close modal and show success message
+          rejectTestPlanModal.hide();
+
+          setTimeout(() => {
+            alert(
+              `❌ Test Plan "${testPlan.name}" has been rejected.\n\nReason: ${reason}`,
+            );
+          }, 300);
+        });
+
+        if (btnApproveTestPlan) {
+          btnApproveTestPlan.addEventListener("click", handleApproveTestPlan);
+        }
+
+        if (btnRejectTestPlan) {
+          btnRejectTestPlan.addEventListener("click", handleRejectTestPlan);
+        }
+
+        if (btnApproveTestPlanBanner) {
+          btnApproveTestPlanBanner.addEventListener(
+            "click",
+            handleApproveTestPlan,
+          );
+        }
+
+        if (btnRejectTestPlanBanner) {
+          btnRejectTestPlanBanner.addEventListener(
+            "click",
+            handleRejectTestPlan,
+          );
+        }
+
+        // Clear modal when it's hidden
+        document
+          .getElementById("rejectTestPlanModal")
+          .addEventListener("hidden.bs.modal", () => {
+            rejectTestPlanReason.value = "";
+          });
 
         // PowerApps Sidebar Toggle
         const sidebarToggle = document.getElementById("sidebarToggle");
